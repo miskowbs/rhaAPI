@@ -135,7 +135,7 @@ router.put('/api/v1/member/:id', (req, res, next) => {
 
     client.query(firstQuery, colValues);
 
-    const query = client.query('SELECT * FROM members WHERE user_id = $1', [id];
+    const query = client.query('SELECT * FROM members WHERE user_id = $1', [id]);
 
     query.on('row', (row) => {
       results.push(row);
