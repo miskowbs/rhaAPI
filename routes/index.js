@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-var pg = require('pg');
+var pg = require('pg'); 
 var path = require('path');
 var connectionString = process.env.DATABASE_URL || 'postgres://postgres:rhasite@rha-website-0.csse.rose-hulman.edu/rha'
 
@@ -41,6 +41,33 @@ router.get('/api/v1/pastEvents', (req, res, next) => {
     }
 
     const query = client.query('SELECT proposal_name, event_date, cost_to_attendee, image_path, description, attendees FROM proposals WHERE approved = true AND event_date < CURRENT_DATE AND event_signup_open IS NOT NULL AND event_signup_close IS NOT NULL AND event_date IS NOT NULL ORDER BY proposal_id ASC;');
+    
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
+/* GET single event by id*/
+router.get('/api/v1/pastEvents/:id', (req, res, next) => {
+  const results = [];
+
+  const id = req.params.id;
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console;
+      console.log(err);
+      return res.status(500).json({success: false, data: "You did something so bad you broke the server =("});
+    }
+
+    const query = client.query('SELECT proposal_id, proposal_name, event_date, cost_to_attendee, image_path, description, attendees FROM proposals WHERE proposal_id = $1;', [id]);
     
     query.on('row', (row) => {
       results.push(row);
