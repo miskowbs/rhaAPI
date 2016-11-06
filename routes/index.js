@@ -54,7 +54,7 @@ router.get('/api/v1/pastEvents', (req, res, next) => {
 });
 
 /* GET single event by id*/
-router.get('/api/v1/pastEvents/:id', (req, res, next) => {
+router.get('/api/v1/events/:id', (req, res, next) => {
   const results = [];
 
   const id = req.params.id;
