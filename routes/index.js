@@ -116,7 +116,7 @@ router.put('/api/v1/events/:id', (req, res, next) => {
 });
 
 /* PUT add a member to a list of attendees */
-router.put('/api/vi/events/:event_id/attendees/:member_id', (req, res, next) => {
+router.put('/api/v1/events/:event_id/attendees/:member_id', (req, res, next) => {
   const results = [];
 
   const event_id = req.params.event_id;
