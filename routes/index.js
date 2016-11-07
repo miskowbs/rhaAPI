@@ -133,7 +133,7 @@ router.put('/api/v1/events/:event_id/attendees/:member_id', (req, res, next) => 
 
     client.query(firstQuery, [event_id, member_id]);
 
-    const query = client.query('SELECT * FROM proposals WHERE proposal_id = $1', [id]);
+    const query = client.query('SELECT * FROM proposals WHERE proposal_id = $1', [event_id]);
 
     query.on('row', (row) => {
       results.push(row);
