@@ -81,7 +81,7 @@ router.get('/api/v1/events/:id', (req, res, next) => {
 });
 
 /* PUT modify an event */
-router.put('/api/v1/event/:id', (req, res, next) => {
+router.put('/api/v1/events/:id', (req, res, next) => {
   const results = [];
 
   const id = req.params.id;
@@ -101,6 +101,37 @@ router.put('/api/v1/event/:id', (req, res, next) => {
     });
 
     client.query(firstQuery, colValues);
+
+    const query = client.query('SELECT * FROM proposals WHERE proposal_id = $1', [id]);
+
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
+/* PUT add a member to a list of attendees */
+router.put('/api/vi/events/:event_id/attendees/:member_id', (req, res, next) => {
+  const results = [];
+
+  const event_id = req.params.event_id;
+  const member_id = req.params.member_id;
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
+    }
+
+    var firstQuery = 'UPDATE proposals SET attendees = array_to_json(array(select * from jsonb_array_elements_text(attendees)) || (select username from members where user_id = $2)::text)::jsonb WHERE proposal_id = $1;'
+
+    client.query(firstQuery, [event_id, member_id]);
 
     const query = client.query('SELECT * FROM proposals WHERE proposal_id = $1', [id]);
 
