@@ -363,9 +363,9 @@ router.put('/api/v1/fund/:id', (req, res, next) => {
 /* POST a new proposal */
 router.post('/api/v1/proposal', (req, res, next) => {
   const results= [];
-
+console.log(req.body);
   const data = {name: req.body.name, cost_to_attendee: req.body.cost_to_attendee, event_date: req.body.event_date, event_signup_open: req.body.event_signup_open, event_signup_close: req.body.event_signup_close, image_path: req.body.image_path, description: req.body.description, proposer: req.body.proposer, week_proposed: req.body.week_proposed, quarter_proposed: req.body.quarter_proposed, money_requested: req.body.money_requested, approved: req.body.approved};
-
+  console.log(data.name, data.cost_to_attendee, data.event_date, data.description, data.proposer, data.week_proposed, data.quarter_proposed, data.money_requested);
   if(data.name==null || data.cost_to_attendee==null || data.event_date== null || data.description==null || data.proposer==null || data.week_proposed == null || data.quarter_proposed==null || data.money_requested==null ) {
     return res.status(400).json({success: false, data: "This is not properly formed proposal. Please follow proposal submission guidelines."});
   }
