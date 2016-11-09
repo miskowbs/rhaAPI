@@ -129,7 +129,7 @@ router.put('/api/v1/events/:event_id/attendees/:member_id', (req, res, next) => 
       return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
     }
 
-    var firstQuery = 'UPDATE proposals SET attendees = array_to_json(array(select * from jsonb_array_elements_text(attendees)) || (select username from members where user_id = $2)::text)::jsonb WHERE proposal_id = $1;'
+    var firstQuery = 'UPDATE proposals SET attendees = array_to_json(array(select * from jsonb_array_elements_text(attendees)) || (select username from members where username = $2)::text)::jsonb WHERE proposal_id = $1;'
 
     client.query(firstQuery, [event_id, member_id]);
 
