@@ -301,7 +301,7 @@ router.put('/api/v1/committee/:id', (req, res, next) => {
 });
 
 /* DELETE a committee */
-router.DELETE('/api/v1/committee/:id', (req, res, next) => {
+router.delete('/api/v1/committee/:id', (req, res, next) => {
   const results = [];
 
   const id = req.params.id;
