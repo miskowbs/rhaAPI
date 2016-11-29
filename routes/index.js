@@ -300,6 +300,28 @@ router.put('/api/v1/committee/:id', (req, res, next) => {
   });
 });
 
+/* DELETE a committee */
+router.DELETE('/api/v1/committee/:id', (req, res, next) => {
+  const results = [];
+
+  const id = req.params.id;
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
+    }
+
+    const query = client.query('DELETE FROM committee WHERE committeeid = $1', [id]);
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
 /* GET all funds */
 router.get('/api/v1/funds', (req, res, next) => {
   const results = [];
