@@ -15,7 +15,7 @@ router.get('/api/v1/events', (req, res, next) => {
       return res.status(500).json({success: false, data: err});
     }
 
-    const query = client.query('SELECT proposal_id, proposal_name, event_date, event_signup_close, cost_to_attendee, image_path, description, attendees FROM proposals WHERE approved = true AND event_date >= CURRENT_DATE ORDER BY event_date ASC;');
+    const query = client.query('SELECT proposal_id, proposal_name, event_date, event_signup_close, event_signup_open, cost_to_attendee, image_path, description, attendees FROM proposals WHERE approved = true AND event_date >= CURRENT_DATE ORDER BY event_date ASC;');
     
     query.on('row', (row) => {
       results.push(row);
@@ -40,7 +40,7 @@ router.get('/api/v1/pastEvents', (req, res, next) => {
       return res.status(500).json({success: false, data: "You did something so bad you broke the server =("});
     }
 
-    const query = client.query('SELECT proposal_id, proposal_name, event_date, cost_to_attendee, image_path, description, attendees FROM proposals WHERE approved = true AND event_date < CURRENT_DATE AND event_signup_open IS NOT NULL AND event_signup_close IS NOT NULL AND event_date IS NOT NULL ORDER BY event_date DESC;');
+    const query = client.query('SELECT proposal_id, proposal_name, event_date, event_signup_close, event_signup_open, cost_to_attendee, image_path, description, attendees FROM proposals WHERE approved = true AND event_date < CURRENT_DATE AND event_signup_open IS NOT NULL AND event_signup_close IS NOT NULL AND event_date IS NOT NULL ORDER BY event_date DESC;');
     
     query.on('row', (row) => {
       results.push(row);
@@ -67,7 +67,7 @@ router.get('/api/v1/events/:id', (req, res, next) => {
       return res.status(500).json({success: false, data: "You did something so bad you broke the server =("});
     }
 
-    const query = client.query('SELECT proposal_id, proposal_name, event_date, cost_to_attendee, image_path, description, attendees FROM proposals WHERE proposal_id = $1;', [id]);
+    const query = client.query('SELECT proposal_id, proposal_name, event_date, event_signup_close, event_signup_open, cost_to_attendee, image_path, description, attendees FROM proposals WHERE proposal_id = $1;', [id]);
     
     query.on('row', (row) => {
       results.push(row);
