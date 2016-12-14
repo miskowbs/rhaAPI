@@ -146,8 +146,8 @@ router.put('/api/v1/events/:event_id/attendees/:member_id', (req, res, next) => 
   });
 });
 
-/* Put remove a member from a list of attendees */
-router.put('/api/v1/events/:event_id/attendees/:member_id', (req, res, next) => {
+/* DELETE remove a member from a list of attendees */
+router.delete('/api/v1/events/:event_id/attendees/:member_id', (req, res, next) => {
   const results = [];
 
   const event_id = req.params.event_id;
