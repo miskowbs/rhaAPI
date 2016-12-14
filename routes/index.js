@@ -146,6 +146,37 @@ router.put('/api/v1/events/:event_id/attendees/:member_id', (req, res, next) => 
   });
 });
 
+/* Put remove a member from a list of attendees */
+router.put('/api/v1/events/:event_id/attendees/:member_id', (req, res, next) => {
+  const results = [];
+
+  const event_id = req.params.event_id;
+  const member_id = req.params.member_id;
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
+    }
+
+    var firstQuery = 'UPDATE proposals SET attendees = array_to_json(array_remove(array(select * from jsonb_array_elements_text(attendees)), select username from members where username = $2)::text)::jsonb WHERE proposal_id = $1;'
+
+    client.query(firstQuery, [event_id, member_id]);
+
+    const query = client.query('SELECT * FROM proposals WHERE proposal_id = $1', [event_id]);
+
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
 /* GET all officers */
 router.get('/api/v1/officers', (req, res, next) => {
   const results = [];
