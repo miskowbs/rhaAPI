@@ -237,6 +237,40 @@ router.put('/api/v1/member/:id', (req, res, next) => {
   });
 });
 
+/* POST new officer */
+router.post('/api/v1/officer', (req, res, next) => {
+  const results= [];
+
+  const data = {username: req.body.username, firstname: req.body.firstname, lastname: req.body.lastname, hall: req.body.hall, image: req.body.image, memberType: req.body.memberType, CM: req.body.CM, phoneNumber: req.body.phoneNumber, roomNumber: req.body.roomNumber};
+
+  if(data.username==null || data.firstname == null || data.lastname == null || data.hall == null || data.image == null || data.memberType == null || data.CM == null || data.phoneNumber == null || data.roomNumber == null ) {
+    return res.status(400).json({success: false, data: "This is not a properly formed officer."});
+  }
+
+  pg.connect(connectionString, (err, client, done) => {
+
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: err});
+    }
+
+    client.query('INSERT INTO members(username, firstname, lastname, hall, image, memberType,CM, phone_number, room_number) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9);',
+      [data.username, data.firstname, data.lastname, data.hall, data.image, data.memberType, data.CM, data.phoneNumber, data.roomNumber]);
+
+    const query = client.query('SELECT * FROM members WHERE username = $1', [data.username]);
+
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
 /* GET all committees */
 router.get('/api/v1/committees', (req, res, next) => {
   const results = [];
