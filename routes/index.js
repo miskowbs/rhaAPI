@@ -4,6 +4,10 @@ var pg = require('pg');
 var path = require('path');
 var connectionString = process.env.DATABASE_URL || 'postgres://postgres:rhasite@rha-website-0.csse.rose-hulman.edu/rha'
 
+
+/*---------------------------- Events Endpoints ------------------------------*/
+
+
 /* GET active events */
 router.get('/api/v1/events', (req, res, next) => {
   const results = [];
@@ -115,6 +119,8 @@ router.put('/api/v1/events/:id', (req, res, next) => {
   });
 });
 
+/*---------------------------- Member and Event Endpoint ------------------------------*/
+
 /* PUT add a member to a list of attendees */
 router.put('/api/v1/events/:event_id/attendees/:member_id', (req, res, next) => {
   const results = [];
@@ -177,7 +183,9 @@ router.delete('/api/v1/events/:event_id/attendees/:member_id', (req, res, next) 
   });
 });
 
-/* GET all officers */
+/*---------------------------- Members Endpoints ------------------------------*/
+
+/* GET all officers (from Members) */
 router.get('/api/v1/officers', (req, res, next) => {
   const results = [];
 
@@ -237,13 +245,13 @@ router.put('/api/v1/member/:id', (req, res, next) => {
   });
 });
 
-/* POST new officer */
+/* POST new officer (into Members) */
 router.post('/api/v1/officer', (req, res, next) => {
   const results= [];
 
   const data = {username: req.body.username, firstname: req.body.firstname, lastname: req.body.lastname, hall: req.body.hall, image: req.body.image, memberType: req.body.memberType, CM: req.body.CM, phoneNumber: req.body.phoneNumber, roomNumber: req.body.roomNumber};
 
-  if(data.username==null || data.firstname == null || data.lastname == null || data.hall == null || data.image == null || data.memberType == null || data.CM == null || data.phoneNumber == null || data.roomNumber == null ) {
+  if(data.username==null || data.firstname == null || data.lastname == null || data.hall == null || data.image == null || data.CM == null || data.phoneNumber == null || data.roomNumber == null ) {
     return res.status(400).json({success: false, data: "This is not a properly formed officer."});
   }
 
@@ -270,6 +278,35 @@ router.post('/api/v1/officer', (req, res, next) => {
     });
   });
 });
+
+/* GET all active members */
+router.get('/api/v1/activeMembers', (req, res, next) => {
+  const results = [];
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console;
+      console.log(err);
+      return res.status(500).json({success: false, data: "You did something so bad you broke the server =("});
+    }
+
+    const query = client.query('SELECT user_id, username, firstname, lastname, hall, image, memberType, cm, phone_number, room_number FROM members WHERE active IS TRUE ORDER BY lastname ASC;');
+    
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
+
+/*---------------------------- Committees Endpoints ------------------------------*/
+
 
 /* GET all committees */
 router.get('/api/v1/committees', (req, res, next) => {
@@ -387,6 +424,9 @@ router.delete('/api/v1/committee/:id', (req, res, next) => {
   });
 });
 
+/*---------------------------- Funds Endpoints ------------------------------*/
+
+
 /* GET all funds */
 router.get('/api/v1/funds', (req, res, next) => {
   const results = [];
@@ -446,6 +486,9 @@ router.put('/api/v1/fund/:id', (req, res, next) => {
     });
   });
 });
+
+
+/*---------------------------- Proposals Endpoints ------------------------------*/
 
 /* POST a new proposal */
 router.post('/api/v1/proposal', (req, res, next) => {
