@@ -385,7 +385,7 @@ router.get('/api/v1/committees', (req, res, next) => {
 router.post('/api/v1/committee', (req, res, next) => {
   const results= [];
 
-  const data = {committeeName: req.body.name, image: req.body.image, description: req.body.description};
+  const data = {committeeName: req.body.committeeName, image: req.body.image, description: req.body.description};
 
   if(data.committeeName==null || data.description == null ) {
     return res.status(400).json({success: false, data: "This is not properly formed committee."});
