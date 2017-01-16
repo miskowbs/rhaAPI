@@ -185,6 +185,32 @@ router.delete('/api/v1/events/:event_id/attendees/:member_id', (req, res, next) 
 
 /*---------------------------- Members Endpoints ------------------------------*/
 
+/* GET all Members */
+router.get('/api/v1/members', (req, res, next) => {
+  const results = [];
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console;
+      console.log(err);
+      return res.status(500).json({success: false, data: "You did something so bad you broke the server =("});
+    }
+
+    const query = client.query('SELECT user_id, username, firstname, lastname, hall, image, memberType, cm, phone_number, room_number FROM members ORDER BY lastname ASC;');
+    
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
+
 /* GET all officers (from Members) */
 router.get('/api/v1/officers', (req, res, next) => {
   const results = [];
