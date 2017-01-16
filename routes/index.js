@@ -4,6 +4,10 @@ var pg = require('pg');
 var path = require('path');
 var connectionString = process.env.DATABASE_URL || 'postgres://postgres:rhasite@rha-website-0.csse.rose-hulman.edu/rha'
 
+
+/*---------------------------- Events Endpoints ------------------------------*/
+
+
 /* GET active events */
 router.get('/api/v1/events', (req, res, next) => {
   const results = [];
@@ -115,6 +119,8 @@ router.put('/api/v1/events/:id', (req, res, next) => {
   });
 });
 
+/*---------------------------- Member and Event Endpoint ------------------------------*/
+
 /* PUT add a member to a list of attendees */
 router.put('/api/v1/events/:event_id/attendees/:member_id', (req, res, next) => {
   const results = [];
@@ -177,7 +183,35 @@ router.delete('/api/v1/events/:event_id/attendees/:member_id', (req, res, next) 
   });
 });
 
-/* GET all officers */
+/*---------------------------- Members Endpoints ------------------------------*/
+
+/* GET all Members */
+router.get('/api/v1/members', (req, res, next) => {
+  const results = [];
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console;
+      console.log(err);
+      return res.status(500).json({success: false, data: "You did something so bad you broke the server =("});
+    }
+
+    const query = client.query('SELECT user_id, username, firstname, lastname, hall, image, memberType, cm, phone_number, room_number FROM members ORDER BY lastname ASC;');
+    
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
+
+/* GET all officers (from Members) */
 router.get('/api/v1/officers', (req, res, next) => {
   const results = [];
 
@@ -237,6 +271,91 @@ router.put('/api/v1/member/:id', (req, res, next) => {
   });
 });
 
+/* POST new officer (into Members) */
+router.post('/api/v1/officer', (req, res, next) => {
+  const results= [];
+
+  const data = {username: req.body.username, firstname: req.body.firstname, lastname: req.body.lastname, hall: req.body.hall, image: req.body.image, memberType: req.body.memberType, CM: req.body.CM, phoneNumber: req.body.phoneNumber, roomNumber: req.body.roomNumber};
+
+  if(data.username==null || data.firstname == null || data.lastname == null || data.hall == null || data.image == null || data.CM == null || data.phoneNumber == null || data.roomNumber == null ) {
+    return res.status(400).json({success: false, data: "This is not a properly formed officer."});
+  }
+
+  pg.connect(connectionString, (err, client, done) => {
+
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: err});
+    }
+
+    client.query('INSERT INTO members(username, firstname, lastname, hall, image, memberType,CM, phone_number, room_number) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9);',
+      [data.username, data.firstname, data.lastname, data.hall, data.image, data.memberType, data.CM, data.phoneNumber, data.roomNumber]);
+
+    const query = client.query('SELECT * FROM members WHERE username = $1', [data.username]);
+
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
+/* GET all active members */
+router.get('/api/v1/activeMembers', (req, res, next) => {
+  const results = [];
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console;
+      console.log(err);
+      return res.status(500).json({success: false, data: "You did something so bad you broke the server =("});
+    }
+
+    const query = client.query('SELECT user_id, username, firstname, lastname, hall, image, memberType, cm, phone_number, room_number FROM members WHERE active IS TRUE ORDER BY lastname ASC;');
+    
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
+/* DELETE a member */
+router.delete('/api/v1/member/:id', (req, res, next) => {
+  const results = [];
+
+  const id = req.params.id;
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
+    }
+
+    const query = client.query('DELETE FROM member WHERE user_id = $1', [id]);
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
+
+/*---------------------------- Committees Endpoints ------------------------------*/
+
+
 /* GET all committees */
 router.get('/api/v1/committees', (req, res, next) => {
   const results = [];
@@ -266,7 +385,7 @@ router.get('/api/v1/committees', (req, res, next) => {
 router.post('/api/v1/committee', (req, res, next) => {
   const results= [];
 
-  const data = {committeeName: req.body.name, image: req.body.image, description: req.body.description};
+  const data = {committeeName: req.body.committeeName, image: req.body.image, description: req.body.description};
 
   if(data.committeeName==null || data.description == null ) {
     return res.status(400).json({success: false, data: "This is not properly formed committee."});
@@ -353,6 +472,9 @@ router.delete('/api/v1/committee/:id', (req, res, next) => {
   });
 });
 
+/*---------------------------- Funds Endpoints ------------------------------*/
+
+
 /* GET all funds */
 router.get('/api/v1/funds', (req, res, next) => {
   const results = [];
@@ -412,6 +534,9 @@ router.put('/api/v1/fund/:id', (req, res, next) => {
     });
   });
 });
+
+
+/*---------------------------- Proposals Endpoints ------------------------------*/
 
 /* POST a new proposal */
 router.post('/api/v1/proposal', (req, res, next) => {
