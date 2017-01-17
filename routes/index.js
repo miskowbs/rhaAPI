@@ -197,7 +197,7 @@ router.get('/api/v1/members', (req, res, next) => {
       return res.status(500).json({success: false, data: "You did something so bad you broke the server =("});
     }
 
-    const query = client.query('SELECT user_id, username, firstname, lastname, hall, image, memberType, cm, phone_number, room_number FROM members ORDER BY lastname ASC;');
+    const query = client.query('SELECT user_id, username, firstname, lastname, hall, image, memberType, cm, phone_number, room_number, active FROM members ORDER BY lastname ASC;');
     
     query.on('row', (row) => {
       results.push(row);
