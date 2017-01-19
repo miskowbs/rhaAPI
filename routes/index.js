@@ -547,23 +547,29 @@ router.post('/api/v1/proposal', (req, res, next) => {
     if(err) {
       done();
       console.log(err);
-      return res.status(500).json({success: false, data: err});
+      return res.status(500).json({success: false, data: err, body: req.body});
     }
 
-    var firstQuery = createNewEntryQuery(req.body, 'proposals');
+
+    var reqJson = JSON.parse(req.body);
+    var firstQuery = createNewEntryQuery(reqJson, 'proposals');
 
     var colValues = [];
-    Objectkeys(req.body).filter(function (key) {
-      colValues.push(req.body[key]);
+    Object.keys(reqJson).filter(function (key) {
+      colValues.push(reqJson[key]);
     });
+
+    console.log(firstQuery);
 
     client.query(firstQuery, colValues);
 
-    firstQuery.on('row', (row) => {
+    const query = client.query('SELECT * FROM proposals WHERE proposal_name = $1', [reqJson.proposal_name])
+
+    query.on('row', (row) => {
       results.push(row);
     });
 
-    firstQuery.on('end', () => {
+    query.on('end', () => {
       done();
       return res.json(results);
     });
@@ -583,7 +589,7 @@ router.get('/api/v1/equipment', (req, res, next) => {
       return res.status(500).json({success: false, data: err});
     }
 
-    const query = client.query('SELECT equipmentid, equipmentname, equipmentdescripton, rentaltimeindays, equipmentEmbed FROM equipment;');
+    const query = client.query('SELECT equipmentid, equipmentname, equipmentdescription, rentaltimeindays, equipmentEmbed FROM equipment;');
     
     query.on('row', (row) => {
       results.push(row);
