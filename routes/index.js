@@ -541,12 +541,6 @@ router.put('/api/v1/fund/:id', (req, res, next) => {
 /* POST a new proposal */
 router.post('/api/v1/proposal', (req, res, next) => {
   const results= [];
-console.log(req.body);
-  const data = {name: req.body.name, cost_to_attendee: req.body.cost_to_attendee, event_date: req.body.event_date, event_signup_open: req.body.event_signup_open, event_signup_close: req.body.event_signup_close, image_path: req.body.image_path, description: req.body.description, proposer: req.body.proposer, week_proposed: req.body.week_proposed, quarter_proposed: req.body.quarter_proposed, money_requested: req.body.money_requested, approved: req.body.approved};
-  console.log(data.name, data.cost_to_attendee, data.event_date, data.description, data.proposer, data.week_proposed, data.quarter_proposed, data.money_requested);
-  if(data.name==null || data.cost_to_attendee==null || data.event_date== null || data.description==null || data.proposer==null || data.week_proposed == null || data.quarter_proposed==null || data.money_requested==null ) {
-    return res.status(400).json({success: false, data: "This is not properly formed proposal. Please follow proposal submission guidelines."});
-  }
 
   pg.connect(connectionString, (err, client, done) => {
 
@@ -556,11 +550,41 @@ console.log(req.body);
       return res.status(500).json({success: false, data: err});
     }
 
-    client.query('INSERT INTO proposals(proposal_name, cost_to_attendee, event_date, event_signup_open, event_signup_close, image_path, description, proposer, week_proposed, quarter_proposed, money_requested, approved) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12);',
-      [data.name, data.cost_to_attendee, data.event_date, data.event_signup_open, data.event_signup_close, data.image_path, data.description, data.proposer, data.week_proposed, data.quarter_proposed, data.money_requested, data.approved]);
-    
-    const query = client.query('SELECT * FROM proposals WHERE proposal_name = $1', [data.name]);
+    var firstQuery = createNewEntryQuery(req.body, 'proposals');
 
+    var colValues = [];
+    Objectkeys(req.body).filter(function (key) {
+      colValues.push(req.body[key]);
+    });
+
+    client.query(firstQuery, colValues);
+
+    firstQuery.on('row', (row) => {
+      results.push(row);
+    });
+
+    firstQuery.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
+/*---------------------------- Equipment Endpoints ------------------------------*/
+
+/* GET all equipment data */
+router.get('/api/v1/equipment', (req, res, next) => {
+  const results = [];
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: err});
+    }
+
+    const query = client.query('SELECT equipmentid, equipmentname, equipmentdescripton, rentaltimeindays, equipmentEmbed FROM equipment;');
+    
     query.on('row', (row) => {
       results.push(row);
     });
@@ -571,6 +595,8 @@ console.log(req.body);
     });
   });
 });
+
+/*---------------------------- Query Help ------------------------------*/
 
 /* Create an UpdateQuery */
 function createUpdateQuery (filterVal, filter, cols, table) {
@@ -586,4 +612,20 @@ function createUpdateQuery (filterVal, filter, cols, table) {
 
   return query.join(' ');
 }
+
+function createNewEntryQuery(cols, table) {
+  var query = ['INSERT INTO ' + table + "("];
+
+  var toUpdate = [];
+  var variables = [];
+  Object.keys(cols).forEach(function (key, i) {
+    toUpdate.push(key);
+    variables.push('($' + (i+1) + ')');
+  });
+
+  query.push(toUpdate.join(', ') + ') VALUES (' + variables.join(', ') + ')');
+  
+  return query.join('');
+}
 module.exports = router;
+
