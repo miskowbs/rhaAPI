@@ -613,6 +613,7 @@ function createUpdateQuery (filterVal, filter, cols, table) {
   return query.join(' ');
 }
 
+/* Create an INSERT INTO Query */
 function createNewEntryQuery(cols, table) {
   var query = ['INSERT INTO ' + table + "("];
 
