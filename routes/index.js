@@ -542,6 +542,8 @@ router.put('/api/v1/fund/:id', (req, res, next) => {
 router.post('/api/v1/proposal', (req, res, next) => {
   const results= [];
 
+  console.log(req.body);
+
   pg.connect(connectionString, (err, client, done) => {
 
     if(err) {
@@ -552,8 +554,9 @@ router.post('/api/v1/proposal', (req, res, next) => {
 
 
     var reqJson = JSON.parse(req.body);
+    console.log(reqJson);
     var firstQuery = createNewEntryQuery(reqJson, 'proposals');
-
+    
     var colValues = [];
     Object.keys(reqJson).filter(function (key) {
       colValues.push(reqJson[key]);
