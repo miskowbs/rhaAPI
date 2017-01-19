@@ -553,10 +553,10 @@ router.post('/api/v1/proposal', (req, res, next) => {
     }
 
 
-    var reqJson = JSON.parse(req.body);
+    var reqJson = req.body;
     console.log(reqJson);
     var firstQuery = createNewEntryQuery(reqJson, 'proposals');
-    
+
     var colValues = [];
     Object.keys(reqJson).filter(function (key) {
       colValues.push(reqJson[key]);

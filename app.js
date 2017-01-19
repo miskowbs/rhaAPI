@@ -68,5 +68,9 @@ app.use(function(err, req, res, next) {
   });
 });
 
+app.options('*', function(req, res) {
+    res.send(200);
+});
+
 
 module.exports = app;
