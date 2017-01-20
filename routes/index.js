@@ -3,7 +3,8 @@ var router = express.Router();
 var pg = require('pg'); 
 var path = require('path');
 var connectionString = process.env.DATABASE_URL || 'postgres://postgres:rhasite@rha-website-0.csse.rose-hulman.edu/rha'
-
+var bodyParser = require('body-parser');
+var urlencodedParser = bodyParser.urlencoded({ extended: false});
 
 /*---------------------------- Events Endpoints ------------------------------*/
 
@@ -539,7 +540,7 @@ router.put('/api/v1/fund/:id', (req, res, next) => {
 /*---------------------------- Proposals Endpoints ------------------------------*/
 
 /* POST a new proposal */
-router.post('/api/v1/proposal', (req, res, next) => {
+router.post('/api/v1/proposal', urlencodedParser, function(req, res, next) {
   const results= [];
 
   console.log(req.body);
@@ -553,7 +554,7 @@ router.post('/api/v1/proposal', (req, res, next) => {
     }
 
 
-    var reqJson = JSON.parse(req.body);
+    var reqJson = req.body;
     console.log(reqJson);
     var firstQuery = createNewEntryQuery(reqJson, 'proposals');
 
