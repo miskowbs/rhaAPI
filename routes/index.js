@@ -211,6 +211,39 @@ router.get('/api/v1/members', (req, res, next) => {
   });
 });
 
+router.put('/api/v1/newOfficer/:username', () => {
+  const results = [];
+
+  const username = req.params.username;
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
+    }
+
+    var firstQuery = createUpdateQuery(username, 'username', req.body, 'members'); 
+
+    var colValues = [];
+    Object.keys(req.body).filter(function (key) {
+      colValues.push(req.body[key]);
+    });
+
+    client.query(firstQuery, colValues);
+
+    const query = client.query('SELECT * FROM members WHERE user_id = $1', [id]);
+
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
 
 /* GET all officers (from Members) */
 router.get('/api/v1/officers', (req, res, next) => {
