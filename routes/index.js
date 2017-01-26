@@ -222,6 +222,18 @@ router.put('/api/v1/newOfficer/:username', () => {
       console.log(err);
       return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
     }
+      
+    var bodyValid = true;
+    var elements = 0;
+    for (key in req.body) {
+      if (elements >0 || key.toLowerCase() != "memberType") {
+          bodyValid = false;
+          // I don't think this is the right status;
+          return res.status(500).json({success: false, data: "invalid arguments given for the API request."});
+      } else {
+          elements++;
+      }
+    }
 
     var firstQuery = createUpdateQuery(username, 'username', req.body, 'members'); 
 
