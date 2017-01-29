@@ -211,6 +211,47 @@ router.get('/api/v1/members', (req, res, next) => {
   });
 });
 
+router.put('/api/v1/members/:username', () => {
+  const results = [];
+  const username = req.params.username;
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
+    }
+//  var bodyValid = true;
+//  var elements = 0;
+//  for (key in req.body) {
+//  if (elements >0 || key.toLowerCase() != "memberType") {
+//      bodyValid = false;
+//      // I don't think this is the right status;
+//      return res.status(400).json({success: false, data: "invalid arguments given in the json body for the API request."});
+//    } else {
+//        elements++;
+//    }
+//  }
+    var firstQuery = createUpdateQuery(username, 'username', req.body, 'members'); 
+
+    var colValues = [];
+    Object.keys(req.body).filter(function (key) {
+      colValues.push(req.body[key]);
+    });
+
+    client.query(firstQuery, colValues);
+
+    const query = client.query('SELECT * FROM members WHERE username = $1', [username]);
+
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
 
 /* GET all officers (from Members) */
 router.get('/api/v1/officers', (req, res, next) => {
