@@ -372,6 +372,28 @@ router.get('/api/v1/activeMembers', (req, res, next) => {
   });
 });
 
+/* DELETE an event */
+router.delete('/api/v1/event/:id', (req, res, next) => {
+  const results = [];
+
+  const id = req.params.id;
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
+    }
+
+    const query = client.query('DELETE FROM proposals WHERE proposal_id = $1', [id]);
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
 /* DELETE a member */
 router.delete('/api/v1/member/:id', (req, res, next) => {
   const results = [];
