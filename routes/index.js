@@ -211,7 +211,7 @@ router.get('/api/v1/members', (req, res, next) => {
   });
 });
 
-router.put('/api/v1/members/:username', () => {
+router.put('/api/v1/members/:username', (req, res, next) => {
   const results = [];
   const username = req.params.username;
   pg.connect(connectionString, (err, client, done) => {
