@@ -283,7 +283,8 @@ router.put('/api/v1/member/:id', (req, res, next) => {
     }
 
     var firstQuery = createUpdateQuery(id, 'user_id', req.body, 'members'); 
-
+    console.log(firstQuery);
+    console.log(req.body);
     var colValues = [];
     Object.keys(req.body).filter(function (key) {
       colValues.push(req.body[key]);
