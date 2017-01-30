@@ -221,7 +221,8 @@ router.put('/api/v1/members/:username', (req, res, next) => {
       return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
     }
     
-    var firstQuery = createUpdateQuery(username, 'username', req.body, 'members'); 
+    //var firstQuery = createUpdateQuery(username, 'username', req.body, 'members'); 
+    var firstQuery = 'Update members set membertype ($1) where username = /"miskowbs/"';
     console.log(firstQuery);
     console.log(req.body);
     var colValues = [];
