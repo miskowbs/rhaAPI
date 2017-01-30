@@ -233,11 +233,11 @@ router.put('/api/v1/members/:username', (req, res, next) => {
 //  }
     var firstQuery = createUpdateQuery(username, 'username', req.body, 'members'); 
     console.log(firstQuery);
+    console.log(req.body);
     var colValues = [];
     Object.keys(req.body).filter(function (key) {
       colValues.push(req.body[key]);
     });
-    console.log(colValues);
 
     client.query(firstQuery, colValues);
 
