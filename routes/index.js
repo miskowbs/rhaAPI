@@ -33,6 +33,30 @@ router.get('/api/v1/events', (req, res, next) => {
   });
 });
 
+/* GET all events */
+router.get('/api/v1/allEvents', (req, res, next) => {
+  const results = [];
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: err});
+    }
+
+    const query = client.query('SELECT proposal_id, proposal_name, event_date, quarter_proposed, money_requested, money_allocated, paid FROM proposals ORDER BY event_date DESC;');
+    
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
 /* GET past events */
 router.get('/api/v1/pastEvents', (req, res, next) => {
   const results = [];
