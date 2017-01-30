@@ -211,7 +211,7 @@ router.get('/api/v1/members', (req, res, next) => {
   });
 });
 
-router.put('/api/v1/members/:username', () => {
+router.put('/api/v1/members/:username', (req, res, next) => {
   const results = [];
   const username = req.params.username;
   pg.connect(connectionString, (err, client, done) => {
@@ -220,23 +220,14 @@ router.put('/api/v1/members/:username', () => {
       console.log(err);
       return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
     }
-//  var bodyValid = true;
-//  var elements = 0;
-//  for (key in req.body) {
-//  if (elements >0 || key.toLowerCase() != "memberType") {
-//      bodyValid = false;
-//      // I don't think this is the right status;
-//      return res.status(400).json({success: false, data: "invalid arguments given in the json body for the API request."});
-//    } else {
-//        elements++;
-//    }
-//  }
-    var firstQuery = createUpdateQuery(username, 'username', req.body, 'members'); 
+    
+    var firstQuery = createUpdateQuery('($'+ (Object.keys(req.body).length + 1) + ')', 'username', req.body, 'members'); 
 
     var colValues = [];
     Object.keys(req.body).filter(function (key) {
       colValues.push(req.body[key]);
     });
+    colValues.push(username);
 
     client.query(firstQuery, colValues);
 
@@ -292,7 +283,8 @@ router.put('/api/v1/member/:id', (req, res, next) => {
     }
 
     var firstQuery = createUpdateQuery(id, 'user_id', req.body, 'members'); 
-
+    console.log(firstQuery);
+    console.log(req.body);
     var colValues = [];
     Object.keys(req.body).filter(function (key) {
       colValues.push(req.body[key]);
@@ -364,6 +356,28 @@ router.get('/api/v1/activeMembers', (req, res, next) => {
     query.on('row', (row) => {
       results.push(row);
     });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
+/* DELETE an event */
+router.delete('/api/v1/event/:id', (req, res, next) => {
+  const results = [];
+
+  const id = req.params.id;
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
+    }
+
+    const query = client.query('DELETE FROM proposals WHERE proposal_id = $1', [id]);
 
     query.on('end', () => {
       done();
