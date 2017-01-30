@@ -231,7 +231,7 @@ router.put('/api/v1/members/:username', (req, res, next) => {
     });
     colValues.push('miskowbs');
 
-    client.query(firstQuery, ['stuff', 'miskowbs']);
+    client.query(firstQuery, colValues);
 
     const query = client.query('SELECT * FROM members WHERE username = $1', [username]);
 
