@@ -222,9 +222,7 @@ router.put('/api/v1/members/:username', (req, res, next) => {
     }
     
     var firstQuery = createUpdateQuery('($'+ (Object.keys(req.body).length + 1) + ')', 'username', req.body, 'members'); 
-    //var firstQuery = 'Update members set membertype = ($1) where username = ($2)';
-    console.log(firstQuery);
-    console.log(req.body);
+
     var colValues = [];
     Object.keys(req.body).filter(function (key) {
       colValues.push(req.body[key]);
