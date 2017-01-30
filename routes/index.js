@@ -222,15 +222,16 @@ router.put('/api/v1/members/:username', (req, res, next) => {
     }
     
     //var firstQuery = createUpdateQuery(username, 'username', req.body, 'members'); 
-    var firstQuery = 'Update members set membertype = ($1) where username = /"miskowbs/"';
+    var firstQuery = 'Update members set membertype = ($1) where username = ($2)';
     console.log(firstQuery);
     console.log(req.body);
     var colValues = [];
     Object.keys(req.body).filter(function (key) {
       colValues.push(req.body[key]);
     });
+    colValues.push('miskowbs');
 
-    client.query(firstQuery, ['stuff']);
+    client.query(firstQuery, ['stuff', 'miskowbs']);
 
     const query = client.query('SELECT * FROM members WHERE username = $1', [username]);
 
