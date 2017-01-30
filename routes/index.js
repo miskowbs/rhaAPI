@@ -220,17 +220,7 @@ router.put('/api/v1/members/:username', (req, res, next) => {
       console.log(err);
       return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
     }
-//  var bodyValid = true;
-//  var elements = 0;
-//  for (key in req.body) {
-//  if (elements >0 || key.toLowerCase() != "memberType") {
-//      bodyValid = false;
-//      // I don't think this is the right status;
-//      return res.status(400).json({success: false, data: "invalid arguments given in the json body for the API request."});
-//    } else {
-//        elements++;
-//    }
-//  }
+    
     var firstQuery = createUpdateQuery(username, 'username', req.body, 'members'); 
     console.log(firstQuery);
     console.log(req.body);
@@ -239,7 +229,7 @@ router.put('/api/v1/members/:username', (req, res, next) => {
       colValues.push(req.body[key]);
     });
 
-    client.query(firstQuery, colValues);
+    client.query(firstQuery, ['stuff']);
 
     const query = client.query('SELECT * FROM members WHERE username = $1', [username]);
 
