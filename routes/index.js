@@ -44,7 +44,7 @@ router.get('/api/v1/allEvents', (req, res, next) => {
       return res.status(500).json({success: false, data: err});
     }
 
-    const query = client.query('SELECT proposal_id, proposal_name, event_date, quarter_proposed, money_requested, money_allocated, paid, week_proposed FROM proposals ORDER BY event_date DESC;');
+    const query = client.query('SELECT proposal_id, proposal_name, event_date, quarter_proposed, money_requested, money_allocated, proposed_date, paid FROM proposals ORDER BY proposed_date DESC;');
     
     query.on('row', (row) => {
       results.push(row);
