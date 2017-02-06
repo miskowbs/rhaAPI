@@ -643,7 +643,7 @@ router.post('/api/v1/payment', urlencodedParser, function(req, res, next) {
 
     client.query(firstQuery, colValues);
 
-    const query = client.query('SELECT * FROM expenses WHERE expenses_id = $1', [reqJson.expenses_id])
+    const query = client.query('SELECT * FROM expenses WHERE proposal_id = $1, CM = $2, receiver = $3, amountUsed = $4, descripion = $5, accountCode = $6', [reqJson.proposal_id, reqJson.CM, reqJson.receiver, reqJson.amountUsed, reqJson.description, reqJson.accountCode] )
 
     query.on('row', (row) => {
       results.push(row);
