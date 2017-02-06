@@ -615,6 +615,47 @@ router.put('/api/v1/fund/:id', (req, res, next) => {
   });
 });
 
+/* POST a new payment (expense) */
+router.post('/api/v1/payment', urlencodedParser, function(req, res, next) {
+  const results= [];
+
+  console.log(req.body);
+
+  pg.connect(connectionString, (err, client, done) => {
+
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: err, body: req.body});
+    }
+
+
+    var reqJson = req.body;
+    console.log(reqJson);
+    var firstQuery = createNewEntryQuery(reqJson, 'expenses');
+
+    var colValues = [];
+    Object.keys(reqJson).filter(function (key) {
+      colValues.push(reqJson[key]);
+    });
+
+    console.log(firstQuery);
+
+    client.query(firstQuery, colValues);
+
+    const query = client.query('SELECT * FROM expenses WHERE expenses_id = $1', [reqJson.expenses_id])
+
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
 
 /*---------------------------- Proposals Endpoints ------------------------------*/
 
