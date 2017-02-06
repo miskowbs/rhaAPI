@@ -661,6 +661,46 @@ router.get('/api/v1/equipment', (req, res, next) => {
   });
 });
 
+/*---------------------------- Attendance Endpoints ------------------------------*/
+
+router.put('/api/v1/attendance', (req, res, next) => {
+  const results = [];
+
+  var sortedUsernames = JSON.parse(req.body).membersToUpdate;
+
+  console.log(sortedUsernames);
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
+    }
+/*
+    var firstQuery = createUpdateQuery(id, 'proposal_id', req.body, 'proposals');
+
+    var colValues = [];
+    Object.keys(req.body).filter(function (key) {
+      colValues.push(req.body[key]);
+    });
+
+    client.query(firstQuery, colValues);
+
+    const query = client.query('SELECT * FROM proposals WHERE proposal_id = $1', [id]);
+
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+
+*/
+  });
+});
+
 /*---------------------------- Query Help ------------------------------*/
 
 /* Create an UpdateQuery */
