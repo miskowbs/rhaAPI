@@ -663,7 +663,7 @@ router.get('/api/v1/equipment', (req, res, next) => {
 
 /*---------------------------- Attendance Endpoints ------------------------------*/
 
-router.put('/api/v1/attendance', (req, res, next) => {
+router.put('/api/v1/attendance', urlencodedParser, (req, res, next) => {
   const results = [];
 
   var sortedUsernames = JSON.parse(req.body).membersToUpdate;
