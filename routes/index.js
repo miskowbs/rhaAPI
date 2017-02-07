@@ -629,14 +629,6 @@ router.put('/api/v1/addition', (req, res, next) => {
     }
     var reqJson = req.body;
     console.log(reqJson);
-    var firstQuery = createUpdateQuery('Additions', 'fund_name', reqJson, 'funds'); 
-
-    var colValues = [];
-    Object.keys(req.body).filter(function (key) {
-      colValues.push(req.body[key]);
-    });
-
-    client.query(firstQuery, colValues);
 
     const query = client.query('SELECT * FROM add_additions($1)', [reqJson.addition]);
 
