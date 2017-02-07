@@ -615,7 +615,7 @@ router.put('/api/v1/fund/:id', (req, res, next) => {
   });
 });
 
-/* GET all funds */
+/* GET all payments (expenses) */
 router.get('/api/v1/payments', (req, res, next) => {
   const results = [];
 
@@ -679,7 +679,42 @@ router.post('/api/v1/payment', urlencodedParser, function(req, res, next) {
   });
 });
 
-/* DELETE an expense */
+/* PUT modify a payment (expense) */
+router.put('/api/v1/payment/:id', (req, res, next) => {
+  const results = [];
+
+  const id = req.params.id;
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
+    }
+
+    var firstQuery = createUpdateQuery(id, 'funds_id', req.body, 'funds'); 
+
+    var colValues = [];
+    Object.keys(req.body).filter(function (key) {
+      colValues.push(req.body[key]);
+    });
+
+    client.query(firstQuery, colValues);
+
+    const query = client.query('SELECT * FROM expenses WHERE proposal_id = $1 and CM = $2 and receiver = $3 and amountUsed = $4 and description = $5 and accountCode = $6', [reqJson.proposal_id, reqJson.CM, reqJson.receiver, reqJson.amountUsed, reqJson.description, reqJson.accountCode]) ;
+
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
+/* DELETE a payment (expense) */
 router.delete('/api/v1/payment/:id', (req, res, next) => {
   const results = [];
 
