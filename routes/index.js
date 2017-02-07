@@ -654,7 +654,7 @@ router.get('/api/v1/payment/:id', (req, res, next) => {
       return res.status(500).json({success: false, data: "You did something so bad you broke the server =("});
     }
 
-    const query = client.query('SELECT * FROM expenses ORDER BY expenses_id ASC WHERE expenses_id = $1;', [id]);
+    const query = client.query('SELECT * FROM expenses WHERE expenses_id = $1;', [id]);
     
     query.on('row', (row) => {
       results.push(row);
