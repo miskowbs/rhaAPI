@@ -615,6 +615,7 @@ router.put('/api/v1/fund/:id', (req, res, next) => {
   });
 });
 
+/*---------------------------- Payments / Expenses Endpoints ------------------------------*/
 /* GET all payments (expenses) */
 router.get('/api/v1/payments', (req, res, next) => {
   const results = [];
@@ -822,6 +823,46 @@ router.get('/api/v1/equipment', (req, res, next) => {
 
     const query = client.query('SELECT equipmentid, equipmentname, equipmentdescription, rentaltimeindays, equipmentEmbed FROM equipment;');
     
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
+/*---------------------------- Floor Expenses Endpoints ------------------------------*/
+/* POST a new payment (expense) */
+router.post('/api/v1/floorExpense', urlencodedParser, function(req, res, next) {
+  const results= [];
+
+  pg.connect(connectionString, (err, client, done) => {
+
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: err, body: req.body});
+    }
+
+
+    var reqJson = req.body;
+    console.log(reqJson);
+    var firstQuery = createNewEntryQuery(reqJson, 'floorExpenses');
+
+    var colValues = [];
+    Object.keys(reqJson).filter(function (key) {
+      colValues.push(reqJson[key]);
+    });
+
+    console.log(firstQuery);
+
+    client.query(firstQuery, colValues);
+
+    const query = client.query('SELECT * FROM floorExpenses, floorMoney WHERE floorExpenses.event_description = $1 and floorExpenses.amount = $2 and floorExpenses.turned_in_date = $3 and floorExpenses.processed_date = $4 and floorMoney.hall_and_floor = $5 and floorMoney.floorMoney_id = floorExpenses.floor_id', [reqJson.event_description, reqJson.amount, reqJson.turned_in_date, reqJson.processed_date, reqJson.hall_and_floor] )
+
     query.on('row', (row) => {
       results.push(row);
     });
