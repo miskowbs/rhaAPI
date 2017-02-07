@@ -616,7 +616,7 @@ router.put('/api/v1/fund/:id', (req, res, next) => {
 });
 
 /* PUT to add to additions (funds table) */
-router.put('/api/v1/fund/additions', (req, res, next) => {
+router.put('/api/v1/fund/addition', (req, res, next) => {
   const results = [];
 
   const id = req.params.id;
