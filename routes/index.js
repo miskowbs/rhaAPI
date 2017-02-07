@@ -628,6 +628,7 @@ router.put('/api/v1/fund/addition', (req, res, next) => {
       return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
     }
     var reqJson = req.body;
+    console.log(reqJson);
     var firstQuery = createUpdateQuery('Additions', 'fund_name', reqJson, 'funds'); 
 
     var colValues = [];
