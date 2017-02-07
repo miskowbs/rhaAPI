@@ -627,8 +627,8 @@ router.put('/api/v1/fund/additions', (req, res, next) => {
       console.log(err);
       return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
     }
-
-    var firstQuery = createUpdateQuery('Additions', 'fund_name', req.body, 'funds'); 
+    var reqJson = req.body;
+    var firstQuery = createUpdateQuery('Additions', 'fund_name', reqJson, 'funds'); 
 
     var colValues = [];
     Object.keys(req.body).filter(function (key) {
@@ -637,7 +637,7 @@ router.put('/api/v1/fund/additions', (req, res, next) => {
 
     client.query(firstQuery, colValues);
 
-    const query = client.query('SELECT * FROM funds WHERE fund_name = \'Additions\'');
+    const query = client.query('SELECT * FROM add_additions($1)', [reqJson.addition]);
 
     query.on('row', (row) => {
       results.push(row);
