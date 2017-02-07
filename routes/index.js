@@ -719,7 +719,7 @@ router.put('/api/v1/payment/:id', (req, res, next) => {
       return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
     }
 
-    var firstQuery = createUpdateQuery(id, 'funds_id', req.body, 'funds'); 
+    var firstQuery = createUpdateQuery(id, 'expenses_id', req.body, 'expenses'); 
 
     var colValues = [];
     Object.keys(req.body).filter(function (key) {
