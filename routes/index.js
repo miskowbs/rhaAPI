@@ -615,6 +615,41 @@ router.put('/api/v1/fund/:id', (req, res, next) => {
   });
 });
 
+/* PUT to add to additions (funds table) */
+router.put('/api/v1/fund/additions', (req, res, next) => {
+  const results = [];
+
+  const id = req.params.id;
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
+    }
+
+    var firstQuery = createUpdateQuery('Additions', 'fund_name', req.body, 'funds'); 
+
+    var colValues = [];
+    Object.keys(req.body).filter(function (key) {
+      colValues.push(req.body[key]);
+    });
+
+    client.query(firstQuery, colValues);
+
+    const query = client.query('SELECT * FROM funds WHERE fund_name = \'Additions\'');
+
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
 /*---------------------------- Payments / Expenses Endpoints ------------------------------*/
 /* GET all payments (expenses) */
 router.get('/api/v1/payments', (req, res, next) => {
