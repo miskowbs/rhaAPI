@@ -615,6 +615,154 @@ router.put('/api/v1/fund/:id', (req, res, next) => {
   });
 });
 
+/* GET all payments (expenses) */
+router.get('/api/v1/payments', (req, res, next) => {
+  const results = [];
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console;
+      console.log(err);
+      return res.status(500).json({success: false, data: "You did something so bad you broke the server =("});
+    }
+
+    const query = client.query('SELECT * FROM expenses ORDER BY expenses_id ASC;');
+    
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
+/* GET single payment (expense) by id*/
+router.get('/api/v1/payment/:id', (req, res, next) => {
+  const results = [];
+
+  const id = req.params.id;
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console;
+      console.log(err);
+      return res.status(500).json({success: false, data: "You did something so bad you broke the server =("});
+    }
+
+    const query = client.query('SELECT * FROM expenses WHERE expenses_id = $1;', [id]);
+    
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
+/* POST a new payment (expense) */
+router.post('/api/v1/payment', urlencodedParser, function(req, res, next) {
+  const results= [];
+
+  pg.connect(connectionString, (err, client, done) => {
+
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: err, body: req.body});
+    }
+
+
+    var reqJson = req.body;
+    console.log(reqJson);
+    var firstQuery = createNewEntryQuery(reqJson, 'expenses');
+
+    var colValues = [];
+    Object.keys(reqJson).filter(function (key) {
+      colValues.push(reqJson[key]);
+    });
+
+    console.log(firstQuery);
+
+    client.query(firstQuery, colValues);
+
+    const query = client.query('SELECT * FROM expenses WHERE proposal_id = $1 and CM = $2 and receiver = $3 and amountUsed = $4 and description = $5 and accountCode = $6', [reqJson.proposal_id, reqJson.CM, reqJson.receiver, reqJson.amountUsed, reqJson.description, reqJson.accountCode] )
+
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
+/* PUT modify a payment (expense) */
+router.put('/api/v1/payment/:id', (req, res, next) => {
+  const results = [];
+
+  const id = req.params.id;
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
+    }
+
+    var firstQuery = createUpdateQuery(id, 'expenses_id', req.body, 'expenses'); 
+
+    var colValues = [];
+    Object.keys(req.body).filter(function (key) {
+      colValues.push(req.body[key]);
+    });
+
+    client.query(firstQuery, colValues);
+
+    const query = client.query('SELECT * FROM expenses WHERE expenses_id = $1', [id]) ;
+
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
+/* DELETE a payment (expense) */
+router.delete('/api/v1/payment/:id', (req, res, next) => {
+  const results = [];
+
+  const id = req.params.id;
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
+    }
+
+    const query = client.query('DELETE FROM expenses WHERE expenses_id = $1', [id]);
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
 
 /*---------------------------- Proposals Endpoints ------------------------------*/
 
