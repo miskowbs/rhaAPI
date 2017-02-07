@@ -619,8 +619,6 @@ router.put('/api/v1/fund/:id', (req, res, next) => {
 router.post('/api/v1/payment', urlencodedParser, function(req, res, next) {
   const results= [];
 
-  console.log(req.body);
-
   pg.connect(connectionString, (err, client, done) => {
 
     if(err) {
