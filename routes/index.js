@@ -835,7 +835,32 @@ router.get('/api/v1/equipment', (req, res, next) => {
 });
 
 /*---------------------------- Floor Expenses Endpoints ------------------------------*/
-/* POST a new payment (expense) */
+
+/* GET all floor expenses */
+router.get('/api/v1/floorExpenses', (req, res, next) => {
+  const results = [];
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console;
+      console.log(err);
+      return res.status(500).json({success: false, data: "You did something so bad you broke the server =("});
+    }
+
+    const query = client.query('SELECT * FROM floorExpenses ORDER BY floor_expense_id ASC;');
+    
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+/* POST a new floor expense */
 router.post('/api/v1/floorExpense', urlencodedParser, function(req, res, next) {
   const results= [];
 
