@@ -616,7 +616,7 @@ router.put('/api/v1/fund/:id', (req, res, next) => {
 });
 
 /* POST a new payment (expense) */
-router.post('/api/v1/payments', urlencodedParser, function(req, res, next) {
+router.post('/api/v1/payment', urlencodedParser, function(req, res, next) {
   const results= [];
 
   console.log(req.body);
