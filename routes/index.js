@@ -654,6 +654,28 @@ router.post('/api/v1/payment', urlencodedParser, function(req, res, next) {
   });
 });
 
+/* DELETE an expense */
+router.delete('/api/v1/payment/:id', (req, res, next) => {
+  const results = [];
+
+  const id = req.params.id;
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
+    }
+
+    const query = client.query('DELETE FROM expenses WHERE expenses_id = $1', [id]);
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
 
 /*---------------------------- Proposals Endpoints ------------------------------*/
 
