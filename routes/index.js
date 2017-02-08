@@ -895,7 +895,7 @@ router.post('/api/v1/awardsOnly', (req, res, next) => {
       return res.status(500).json({success: false, data: err});
     }
 
-    const query = client.query('SELECT * FROM sumOnlyExpenses($1)', [req.body.floorName]);
+    const query = client.query('SELECT * FROM sum_only_expenses($1)', [req.body.floorName]);
     
     query.on('row', (row) => {
       results.push(row);
