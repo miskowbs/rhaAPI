@@ -699,12 +699,16 @@ router.put('/api/v1/attendance', urlencodedParser, (req, res, next) => {
       console.log(err);
       return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
     }
+    var nameAndAttendance = [];
 
     var query = client.query("SELECT username, meet_attend from members ORDER BY username ASC;");
 
-    var nameAndAttendance = [];
     query.on('row', (row) => {
       nameAndAttendance.push(row);
+    });
+
+    query.on('end', () => {
+      console.log(nameAndAttendance);
     })
 /*
     var firstQuery = createUpdateQuery(id, 'proposal_id', req.body, 'proposals');
