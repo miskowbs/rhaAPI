@@ -945,6 +945,42 @@ router.get('/api/v1/floorExpenses', (req, res, next) => {
 //   });
 // });
 
+// /* POST a new payment (expense) */
+// router.post('/api/v1/floorExpense', urlencodedParser, function(req, res, next) {
+//   const results= [];
+
+//   pg.connect(connectionString, (err, client, done) => {
+
+//     if(err) {
+//       done();
+//       console.log(err);
+//       return res.status(500).json({success: false, data: err, body: req.body});
+//     }
+
+
+//     var reqJson = req.body;
+//     var firstQuery = createNewEntryQuery(reqJson, 'floorExpenses');
+
+//     var colValues = [];
+//     Object.keys(reqJson).filter(function (key) {
+//       colValues.push(reqJson[key]);
+//     });
+
+//     client.query(firstQuery, colValues);
+
+//     const query = client.query('SELECT * FROM floorExpenses, floorMoney WHERE floorExpenses.event_description = $1 and floorExpenses.amount = $2 and floorExpenses.turned_in_date = $3 and floorExpenses.processed_date = $4 and floorMoney.hall_and_floor = $5 and floorMoney.floorMoney_id = floorExpenses.floor_id', [reqJson.event_description, reqJson.amount, reqJson.turned_in_date, reqJson.processed_date, reqJson.hall_and_floor] )
+
+//     query.on('row', (row) => {
+//       results.push(row);
+//     });
+
+//     query.on('end', () => {
+//       done();
+//       return res.json(results);
+//     });
+//   });
+// });
+
 /* POST a new payment (expense) */
 router.post('/api/v1/floorExpense', urlencodedParser, function(req, res, next) {
   const results= [];
@@ -959,7 +995,7 @@ router.post('/api/v1/floorExpense', urlencodedParser, function(req, res, next) {
 
 
     var reqJson = req.body;
-    var firstQuery = createNewEntryQuery(reqJson, 'floorExpenses');
+    var firstQuery = createNewEntryQuery(reqJson, 'expenses');
 
     var colValues = [];
     Object.keys(reqJson).filter(function (key) {
@@ -968,7 +1004,7 @@ router.post('/api/v1/floorExpense', urlencodedParser, function(req, res, next) {
 
     client.query(firstQuery, colValues);
 
-    const query = client.query('SELECT * FROM floorExpenses, floorMoney WHERE floorExpenses.event_description = $1 and floorExpenses.amount = $2 and floorExpenses.turned_in_date = $3 and floorExpenses.processed_date = $4 and floorMoney.hall_and_floor = $5 and floorMoney.floorMoney_id = floorExpenses.floor_id', [reqJson.event_description, reqJson.amount, reqJson.turned_in_date, reqJson.processed_date, reqJson.hall_and_floor] )
+    const query = client.query('SELECT * FROM expenses WHERE proposal_id = $1 and CM = $2 and receiver = $3 and amountUsed = $4 and description = $5 and accountCode = $6', [reqJson.proposal_id, reqJson.CM, reqJson.receiver, reqJson.amountUsed, reqJson.description, reqJson.accountCode] )
 
     query.on('row', (row) => {
       results.push(row);
