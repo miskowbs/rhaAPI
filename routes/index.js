@@ -735,15 +735,12 @@ router.post('/api/v1/payment', urlencodedParser, function(req, res, next) {
 
 
     var reqJson = req.body;
-    console.log(reqJson);
     var firstQuery = createNewEntryQuery(reqJson, 'expenses');
 
     var colValues = [];
     Object.keys(reqJson).filter(function (key) {
       colValues.push(reqJson[key]);
     });
-
-    console.log(firstQuery);
 
     client.query(firstQuery, colValues);
 
@@ -914,26 +911,62 @@ router.get('/api/v1/floorExpenses', (req, res, next) => {
   });
 });
 
-/* POST a new floor expense */
-router.post('/api/v1/floorExpense', (req, res, next) => {
+// /* POST a new floor expense */
+// router.post('/api/v1/floorExpense', (req, res, next) => {
+//   const results= [];
+
+//   const data = {floor_id: req.body.floor_id, event_description: req.body.event_description, amount: req.body.amount, turned_in_date: req.body.turned_in_date, processed_date: req.body.processed_date};
+
+//   if(data.floor_id==null || data.event_description == null || data.amount == null || data.turned_in_date == null || data.processed_date == null) {
+//     return res.status(400).json({success: false, data: "This is not a properly formed floor expense."});
+//   }
+
+//   pg.connect(connectionString, (err, client, done) => {
+
+//     if(err) {
+//       done();
+//       console.log(err);
+//       return res.status(500).json({success: false, data: err});
+//     }
+
+//     client.query('INSERT INTO floorExpenses(floor_id, event_description, amount, turned_in_date, processed_date) VALUES ($1, $2, $3, $4, $5);',
+//       [data.floor_id, data.event_description, data.amount, data.turned_in_date, data.processed_date]);
+
+//     const query = client.query('SELECT * FROM floorExpenses, floorMoney WHERE floorExpenses.event_description = $1 and floorExpenses.amount = $2 and floorExpenses.turned_in_date = $3 and floorExpenses.processed_date = $4 and floorMoney.hall_and_floor = $5 and floorMoney.floorMoney_id = floorExpenses.floor_id', [data.event_description, data.amount, data.turned_in_date, data.processed_date, data.hall_and_floor] )
+
+//     query.on('row', (row) => {
+//       results.push(row);
+//     });
+
+//     query.on('end', () => {
+//       done();
+//       return res.json(results);
+//     });
+//   });
+// });
+
+/* POST a new payment (expense) */
+router.post('/api/v1/floorExpense', urlencodedParser, function(req, res, next) {
   const results= [];
-
-  const data = {floor_id: req.body.floor_id, event_description: req.body.event_description, amount: req.body.amount, turned_in_date: req.body.turned_in_date, processed_date: req.body.processed_date};
-
-  if(data.floor_id==null || data.event_description == null || data.amount == null || data.turned_in_date == null || data.processed_date == null) {
-    return res.status(400).json({success: false, data: "This is not a properly formed floor expense."});
-  }
 
   pg.connect(connectionString, (err, client, done) => {
 
     if(err) {
       done();
       console.log(err);
-      return res.status(500).json({success: false, data: err});
+      return res.status(500).json({success: false, data: err, body: req.body});
     }
 
-    client.query('INSERT INTO floorExpenses(floor_id, event_description, amount, turned_in_date, processed_date) VALUES ($1, $2, $3, $4, $5);',
-      [data.floor_id, data.event_description, data.amount, data.turned_in_date, data.processed_date]);
+
+    var reqJson = req.body;
+    var firstQuery = createNewEntryQuery(reqJson, 'floorExpenses');
+
+    var colValues = [];
+    Object.keys(reqJson).filter(function (key) {
+      colValues.push(reqJson[key]);
+    });
+
+    client.query(firstQuery, colValues);
 
     const query = client.query('SELECT * FROM floorExpenses, floorMoney WHERE floorExpenses.event_description = $1 and floorExpenses.amount = $2 and floorExpenses.turned_in_date = $3 and floorExpenses.processed_date = $4 and floorMoney.hall_and_floor = $5 and floorMoney.floorMoney_id = floorExpenses.floor_id', [data.event_description, data.amount, data.turned_in_date, data.processed_date, data.hall_and_floor] )
 
