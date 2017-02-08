@@ -885,7 +885,7 @@ router.get('/api/v1/equipment', (req, res, next) => {
 });
 
 /* GET floor awards value */
-router.get('/api/v1/awardsOnly', (req, res, next) => {
+router.post('/api/v1/awardsOnly', (req, res, next) => {
   const results = [];
 
   pg.connect(connectionString, (err, client, done) => {
@@ -957,11 +957,6 @@ router.post('/api/v1/floorExpense', (req, res, next) => {
       [data.floor_id, data.event_description, data.amount, data.turned_in_date, data.processed_date]);
 
     const query = client.query('SELECT * FROM floorExpenses, floorMoney WHERE floorExpenses.event_description = $1 and floorExpenses.amount = $2 and floorExpenses.turned_in_date = $3 and floorExpenses.processed_date = $4 and floorMoney.floorMoney_id = floorExpenses.floor_id', [data.event_description, data.amount, data.turned_in_date, data.processed_date] )
-
-    console.log("query is: ");
-    console.log(query);
-    console.log("results are: ");
-    console.log(results);
 
     query.on('row', (row) => {
       results.push(row);
