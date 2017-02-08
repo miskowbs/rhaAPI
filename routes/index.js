@@ -692,7 +692,7 @@ router.put('/api/v1/attendance', urlencodedParser, (req, res, next) => {
 
   var sortedUsernames = req.body.membersToUpdate;
 
-  console.log(sortedUsernames);
+  console.log(sortedUsernames[2]);
 
   pg.connect(connectionString, (err, client, done) => {
     if(err) {
