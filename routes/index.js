@@ -692,7 +692,6 @@ router.put('/api/v1/attendance', urlencodedParser, (req, res, next) => {
 
   var sortedUsernames = req.body.membersToUpdate;
 
-  console.log(sortedUsernames[2]);
 
   pg.connect(connectionString, (err, client, done) => {
     if(err) {
@@ -700,6 +699,13 @@ router.put('/api/v1/attendance', urlencodedParser, (req, res, next) => {
       console.log(err);
       return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
     }
+
+    var query = client.query("SELECT username, meet_attend from members ORDER BY username ASC;");
+
+    var nameAndAttendance = [];
+    query.on('row', (row) => {
+      nameAndAttendance.push(row);
+    })
 /*
     var firstQuery = createUpdateQuery(id, 'proposal_id', req.body, 'proposals');
 
@@ -719,9 +725,10 @@ router.put('/api/v1/attendance', urlencodedParser, (req, res, next) => {
     query.on('end', () => {
       done();
       return res.json(results);
+      
     });
-
 */
+
   });
 });
 
