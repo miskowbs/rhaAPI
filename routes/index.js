@@ -884,6 +884,30 @@ router.get('/api/v1/equipment', (req, res, next) => {
   });
 });
 
+/* GET floor awards value */
+router.get('/api/v1/awardsOnly', (req, res, next) => {
+  const results = [];
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: err});
+    }
+
+    const query = client.query('SELECT * FROM sumOnlyExpenses($1)', [req.body.floorName]);
+    
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
 /*---------------------------- Floor Expenses Endpoints ------------------------------*/
 
 /* GET all floor expenses */
