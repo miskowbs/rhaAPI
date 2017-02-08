@@ -655,7 +655,7 @@ router.get('/api/v1/possibleBalance', (req, res, next) => {
       return res.status(500).json({success: false, data: "You did something so bad you broke the server =("});
     }
 
-    const query = client.query('SELECT * FROM calc_possible_earnings($1, $2, $3)', [10, 10, 10]);
+    const query = client.query('SELECT * FROM calc_possible_earnings($1, $2, $3)', ["Blumberg", 10, 10]);
     
     query.on('row', (row) => {
       results.push(row);
