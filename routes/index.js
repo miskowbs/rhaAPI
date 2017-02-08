@@ -580,6 +580,31 @@ router.get('/api/v1/funds', (req, res, next) => {
   });
 });
 
+/* GET all funds (floor money) */
+router.get('/api/v1/floorMoney', (req, res, next) => {
+  const results = [];
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console;
+      console.log(err);
+      return res.status(500).json({success: false, data: "You did something so bad you broke the server =("});
+    }
+
+    const query = client.query('SELECT * FROM floorMoney ORDER BY floorMoney_id ASC;');
+    
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
 /* PUT modify a fund */
 router.put('/api/v1/fund/:id', (req, res, next) => {
   const results = [];
@@ -607,6 +632,205 @@ router.put('/api/v1/fund/:id', (req, res, next) => {
     query.on('row', (row) => {
       results.push(row);
     });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
+/* PUT to add to additions (funds table) */
+router.put('/api/v1/addition', (req, res, next) => {
+  const results = [];
+
+  const id = req.params.id;
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
+    }
+    var reqJson = req.body;
+    console.log(reqJson);
+
+    const query = client.query('SELECT * FROM add_additions($1)', [reqJson.addition]);
+
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
+/* GET possible balance for a floor */
+router.get('/api/v1/possibleBalance', (req, res, next) => {
+  const results = [];
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console;
+      console.log(err);
+      return res.status(500).json({success: false, data: "You did something so bad you broke the server =("});
+    }
+
+    const query = client.query('SELECT * FROM calc_possible_earnings($1, $2, $3)', ["Blumberg", 10, 10]);
+    
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
+/*---------------------------- Payments / Expenses Endpoints ------------------------------*/
+/* GET all payments (expenses) */
+router.get('/api/v1/payments', (req, res, next) => {
+  const results = [];
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console;
+      console.log(err);
+      return res.status(500).json({success: false, data: "You did something so bad you broke the server =("});
+    }
+
+    const query = client.query('SELECT * FROM expenses ORDER BY expenses_id ASC;');
+    
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
+/* GET single payment (expense) by id*/
+router.get('/api/v1/payment/:id', (req, res, next) => {
+  const results = [];
+
+  const id = req.params.id;
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console;
+      console.log(err);
+      return res.status(500).json({success: false, data: "You did something so bad you broke the server =("});
+    }
+
+    const query = client.query('SELECT * FROM expenses WHERE expenses_id = $1;', [id]);
+    
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
+/* POST a new payment (expense) */
+router.post('/api/v1/payment', urlencodedParser, function(req, res, next) {
+  const results= [];
+
+  pg.connect(connectionString, (err, client, done) => {
+
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: err, body: req.body});
+    }
+
+
+    var reqJson = req.body;
+    var firstQuery = createNewEntryQuery(reqJson, 'expenses');
+
+    var colValues = [];
+    Object.keys(reqJson).filter(function (key) {
+      colValues.push(reqJson[key]);
+    });
+
+    client.query(firstQuery, colValues);
+
+    const query = client.query('SELECT * FROM expenses WHERE proposal_id = $1 and CM = $2 and receiver = $3 and amountUsed = $4 and description = $5 and accountCode = $6', [reqJson.proposal_id, reqJson.CM, reqJson.receiver, reqJson.amountUsed, reqJson.description, reqJson.accountCode] )
+
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
+/* PUT modify a payment (expense) */
+router.put('/api/v1/payment/:id', (req, res, next) => {
+  const results = [];
+
+  const id = req.params.id;
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
+    }
+
+    var firstQuery = createUpdateQuery(id, 'expenses_id', req.body, 'expenses'); 
+
+    var colValues = [];
+    Object.keys(req.body).filter(function (key) {
+      colValues.push(req.body[key]);
+    });
+
+    client.query(firstQuery, colValues);
+
+    const query = client.query('SELECT * FROM expenses WHERE expenses_id = $1', [id]) ;
+
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
+/* DELETE a payment (expense) */
+router.delete('/api/v1/payment/:id', (req, res, next) => {
+  const results = [];
+
+  const id = req.params.id;
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
+    }
+
+    const query = client.query('DELETE FROM expenses WHERE expenses_id = $1', [id]);
 
     query.on('end', () => {
       done();
@@ -709,18 +933,70 @@ router.put('/api/v1/attendance', urlencodedParser, (req, res, next) => {
 
     query.on('end', () => {
       console.log(nameAndAttendance);
-    })
+    });
+  });
+});
+
 /*
     var firstQuery = createUpdateQuery(id, 'proposal_id', req.body, 'proposals');
+    const query = client.query('SELECT * FROM proposals WHERE proposal_id = $1', [id]);
+        });
+*/
 
-    var colValues = [];
-    Object.keys(req.body).filter(function (key) {
-      colValues.push(req.body[key]);
+/*---------------------------- Floor Expenses Endpoints ------------------------------*/
+
+/* GET all floor expenses */
+router.get('/api/v1/floorExpenses', (req, res, next) => {
+  const results = [];
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console;
+      console.log(err);
+      return res.status(500).json({success: false, data: "You did something so bad you broke the server =("});
+    }
+
+    const query = client.query('SELECT * FROM floorExpenses ORDER BY floor_expense_id ASC;');
+    
+    query.on('row', (row) => {
+      results.push(row);
     });
 
-    client.query(firstQuery, colValues);
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
 
-    const query = client.query('SELECT * FROM proposals WHERE proposal_id = $1', [id]);
+/* POST a new floor expense */
+router.post('/api/v1/floorExpense', (req, res, next) => {
+  const results= [];
+
+  const data = {floor_id: req.body.floor_id, event_description: req.body.event_description, amount: req.body.amount, turned_in_date: req.body.turned_in_date, processed_date: req.body.processed_date};
+
+  if(data.floor_id==null || data.event_description == null || data.amount == null || data.turned_in_date == null || data.processed_date == null) {
+    return res.status(400).json({success: false, data: "This is not a properly formed floor expense."});
+  }
+
+  pg.connect(connectionString, (err, client, done) => {
+
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: err});
+    }
+
+    client.query('INSERT INTO floorExpenses(floor_id, event_description, amount, turned_in_date, processed_date) VALUES ($1, $2, $3, $4, $5);',
+      [data.floor_id, data.event_description, data.amount, data.turned_in_date, data.processed_date]);
+
+    const query = client.query('SELECT * FROM floorExpenses, floorMoney WHERE floorExpenses.event_description = $1 and floorExpenses.amount = $2 and floorExpenses.turned_in_date = $3 and floorExpenses.processed_date = $4 and floorMoney.hall_and_floor = $5 and floorMoney.floorMoney_id = floorExpenses.floor_id', [data.event_description, data.amount, data.turned_in_date, data.processed_date, data.hall_and_floor] )
+
+    console.log("query is: ");
+    console.log(query);
+    console.log("results are: ");
+    console.log(results);
 
     query.on('row', (row) => {
       results.push(row);
@@ -729,9 +1005,129 @@ router.put('/api/v1/attendance', urlencodedParser, (req, res, next) => {
     query.on('end', () => {
       done();
       return res.json(results);
-      
     });
-*/
+  });
+});
+
+// /* POST a new payment (expense) */
+// router.post('/api/v1/floorExpense', urlencodedParser, function(req, res, next) {
+//   const results= [];
+
+//   pg.connect(connectionString, (err, client, done) => {
+
+//     if(err) {
+//       done();
+//       console.log(err);
+//       return res.status(500).json({success: false, data: err, body: req.body});
+//     }
+
+
+//     var reqJson = req.body;
+//     var firstQuery = createNewEntryQuery(reqJson, 'floorExpenses');
+
+//     var colValues = [];
+//     Object.keys(reqJson).filter(function (key) {
+//       colValues.push(reqJson[key]);
+//     });
+
+//     client.query(firstQuery, colValues);
+
+//     const query = client.query('SELECT * FROM floorExpenses, floorMoney WHERE floorExpenses.event_description = $1 and floorExpenses.amount = $2 and floorExpenses.turned_in_date = $3 and floorExpenses.processed_date = $4 and floorMoney.hall_and_floor = $5 and floorMoney.floorMoney_id = floorExpenses.floor_id', [reqJson.event_description, reqJson.amount, reqJson.turned_in_date, reqJson.processed_date, reqJson.hall_and_floor] )
+
+//     query.on('row', (row) => {
+//       results.push(row);
+//     });
+
+//     query.on('end', () => {
+//       done();
+//       return res.json(results);
+//     });
+//   });
+// });
+
+
+
+/* GET single payment (expense) by id*/
+router.get('/api/v1/floorExpense/:id', (req, res, next) => {
+  const results = [];
+
+  const id = req.params.id;
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console;
+      console.log(err);
+      return res.status(500).json({success: false, data: "You did something so bad you broke the server =("});
+    }
+
+    const query = client.query('SELECT * FROM floorExpenses WHERE floor_expense_id = $1;', [id]);
+    
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
+/* PUT modify a payment (expense) */
+router.put('/api/v1/floorExpense/:id', (req, res, next) => {
+  const results = [];
+
+  const id = req.params.id;
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
+    }
+
+    var firstQuery = createUpdateQuery(id, 'floor_expense_id', req.body, 'floorExpenses'); 
+
+    var colValues = [];
+    Object.keys(req.body).filter(function (key) {
+      colValues.push(req.body[key]);
+    });
+
+    client.query(firstQuery, colValues);
+
+    const query = client.query('SELECT * FROM floorExpenses WHERE floor_expense_id = $1', [id]) ;
+
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
+/* DELETE a payment (expense) */
+router.delete('/api/v1/floorExpense/:id', (req, res, next) => {
+  const results = [];
+
+  const id = req.params.id;
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
+    }
+
+    const query = client.query('DELETE FROM floorExpenses WHERE floor_expense_id = $1', [id]);
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
 
   });
 });
