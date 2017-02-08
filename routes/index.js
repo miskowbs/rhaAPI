@@ -911,39 +911,41 @@ router.get('/api/v1/floorExpenses', (req, res, next) => {
   });
 });
 
-// /* POST a new floor expense */
-// router.post('/api/v1/floorExpense', (req, res, next) => {
-//   const results= [];
+/* POST a new floor expense */
+router.post('/api/v1/floorExpense', (req, res, next) => {
+  const results= [];
 
-//   const data = {floor_id: req.body.floor_id, event_description: req.body.event_description, amount: req.body.amount, turned_in_date: req.body.turned_in_date, processed_date: req.body.processed_date};
+  const data = {floor_id: req.body.floor_id, event_description: req.body.event_description, amount: req.body.amount, turned_in_date: req.body.turned_in_date, processed_date: req.body.processed_date};
 
-//   if(data.floor_id==null || data.event_description == null || data.amount == null || data.turned_in_date == null || data.processed_date == null) {
-//     return res.status(400).json({success: false, data: "This is not a properly formed floor expense."});
-//   }
+  if(data.floor_id==null || data.event_description == null || data.amount == null || data.turned_in_date == null || data.processed_date == null) {
+    return res.status(400).json({success: false, data: "This is not a properly formed floor expense."});
+  }
 
-//   pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionString, (err, client, done) => {
 
-//     if(err) {
-//       done();
-//       console.log(err);
-//       return res.status(500).json({success: false, data: err});
-//     }
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: err});
+    }
 
-//     client.query('INSERT INTO floorExpenses(floor_id, event_description, amount, turned_in_date, processed_date) VALUES ($1, $2, $3, $4, $5);',
-//       [data.floor_id, data.event_description, data.amount, data.turned_in_date, data.processed_date]);
+    client.query('INSERT INTO floorExpenses(floor_id, event_description, amount, turned_in_date, processed_date) VALUES ($1, $2, $3, $4, $5);',
+      [data.floor_id, data.event_description, data.amount, data.turned_in_date, data.processed_date]);
 
-//     const query = client.query('SELECT * FROM floorExpenses, floorMoney WHERE floorExpenses.event_description = $1 and floorExpenses.amount = $2 and floorExpenses.turned_in_date = $3 and floorExpenses.processed_date = $4 and floorMoney.hall_and_floor = $5 and floorMoney.floorMoney_id = floorExpenses.floor_id', [data.event_description, data.amount, data.turned_in_date, data.processed_date, data.hall_and_floor] )
+    const query = client.query('SELECT * FROM floorExpenses, floorMoney WHERE floorExpenses.event_description = $1 and floorExpenses.amount = $2 and floorExpenses.turned_in_date = $3 and floorExpenses.processed_date = $4 and floorMoney.hall_and_floor = $5 and floorMoney.floorMoney_id = floorExpenses.floor_id', [data.event_description, data.amount, data.turned_in_date, data.processed_date, data.hall_and_floor] )
+    console.log("query is: " + query);
+    console.log("results are: " + results);
 
-//     query.on('row', (row) => {
-//       results.push(row);
-//     });
+    query.on('row', (row) => {
+      results.push(row);
+    });
 
-//     query.on('end', () => {
-//       done();
-//       return res.json(results);
-//     });
-//   });
-// });
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
 
 // /* POST a new payment (expense) */
 // router.post('/api/v1/floorExpense', urlencodedParser, function(req, res, next) {
@@ -981,41 +983,7 @@ router.get('/api/v1/floorExpenses', (req, res, next) => {
 //   });
 // });
 
-/* POST a new payment (expense) */
-router.post('/api/v1/floorExpense', urlencodedParser, function(req, res, next) {
-  const results= [];
 
-  pg.connect(connectionString, (err, client, done) => {
-
-    if(err) {
-      done();
-      console.log(err);
-      return res.status(500).json({success: false, data: err, body: req.body});
-    }
-
-
-    var reqJson = req.body;
-    var firstQuery = createNewEntryQuery(reqJson, 'expenses');
-
-    var colValues = [];
-    Object.keys(reqJson).filter(function (key) {
-      colValues.push(reqJson[key]);
-    });
-
-    client.query(firstQuery, colValues);
-
-    const query = client.query('SELECT * FROM expenses WHERE proposal_id = $1 and CM = $2 and receiver = $3 and amountUsed = $4 and description = $5 and accountCode = $6', [reqJson.proposal_id, reqJson.CM, reqJson.receiver, reqJson.amountUsed, reqJson.description, reqJson.accountCode] )
-
-    query.on('row', (row) => {
-      results.push(row);
-    });
-
-    query.on('end', () => {
-      done();
-      return res.json(results);
-    });
-  });
-});
 
 /* GET single payment (expense) by id*/
 router.get('/api/v1/floorExpense/:id', (req, res, next) => {
