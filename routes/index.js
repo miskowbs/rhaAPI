@@ -704,7 +704,7 @@ router.put('/api/v1/attendance', urlencodedParser, (req, res, next) => {
     var query = client.query("SELECT username, meet_attend from members ORDER BY username ASC;");
 
     query.on('row', (row) => {
-      nameAndAttendance.push(row);
+      nameAndAttendance.push({username: row.username, meet_attend: row.meet_attend});
     });
 
     query.on('end', () => {
