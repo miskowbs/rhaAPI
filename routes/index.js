@@ -1198,6 +1198,61 @@ router.post('/api/v1/expensesOnly', (req, res, next) => {
   });
 });
 
+/*------------------------ Function Endpoints---------------------------*/
+/* In these API endpoints, they are all labeled as GETs even though they are
+   defined as router.post requests. This is because these functions often 
+   need arguments, and you need to create POST or PUT requests in order to
+   include a body to contain these arguments.
+*/
+
+/* GET attendance of floor given a quarter */
+router.post('/api/v1/floorAttendance', (req, res, next) => {
+  const results = [];
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: err});
+    }
+
+    const query = client.query('SELECT * FROM count_attendance_for_floor($1, $2)', [req.body.floorName, req.body.quarter]);
+    
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
+/* GET money used for a given proposal_id */
+router.post('/api/v1/getMoneyUsed', (req, res, next) => {
+  const results = [];
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: err});
+    }
+
+    const query = client.query('SELECT * FROM get_money_used($1)', [req.body.proposal_id]);
+    
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
 /*---------------------------- Query Help ------------------------------*/
 
 /* Create an UpdateQuery */
