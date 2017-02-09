@@ -887,8 +887,10 @@ router.get('/api/v1/equipment', (req, res, next) => {
 
 /*---------------------------- Attendance Endpoints ------------------------------*/
 
-router.put('/api/v1/attendance', urlencodedParser, (req, res, next) => {
+router.put('/api/v1/attendance/:quarter', urlencodedParser, (req, res, next) => {
   const results = [];
+
+  var quarter = req.params.quarter;
 
   var sortedUsernames = req.body.membersToUpdate;
   pg.connect(connectionString, (err, client, done) => {
@@ -906,9 +908,59 @@ router.put('/api/v1/attendance', urlencodedParser, (req, res, next) => {
     });
 
     query.on('end', () => {
-      console.log(nameAndAttendance[2].meet_attend);
-      return res.json(nameAndAttendance);
+      nameAndAttendance.foreach(function (e) {
+        var insertAttendance = "UPDATE members SET meet_attend = $1 WHERE username = $2;";
+        var present = 0;
+        var newAttendance = e.meet_attend;
+        var updateQuarter = [];
+        switch(quarter) {
+          case 'Q1':
+            updateQuarter = e.meet_attend.Q1;
+            delete newAttendance.Q1;
+            break;
+          case 'Q2':
+            updateQuarter = e.meet_attend.Q2;
+            delete newAttendance.Q2;
+            break;
+          case 'Q3':
+            updateQuarter = e.meet_attend.Q3;
+            delete newAttendance.Q3;
+            break;
+          default: 
+            return res.status(500).json({success: false, data: req.params.quarter + ' is not a valid quarter!'});
+        }
+        if(sortedUsernames.length > 0) {
+          if(e.username == sortedUsernames[0]) {
+            present = 1;
+          }
+        }
+        updateQuarter.push(present);
+        switch(quarter) {
+          case 'Q1':
+            newAttendance.Q1 = updateQuarter;
+            break;
+          case 'Q2':
+            newAttendance.Q2 = updateQuarter;
+            break;
+          case 'Q3':
+            newAttendance.Q3 = updateQuarter;
+            break;
+          default: 
+            return res.status(500).json({success: false, data: req.params.quarter + ' is not a valid quarter!'});
+        }
+        client.query(insertAttendance, [newAttendance, e.username]);
+      });
     });
+
+    var query2 = client.query("SELECT username, meet_attend from members ORDER BY username ASC;");
+
+    query2.on('row', (row) => {
+      results.push({username: row.username, meet_attend: row.meet_attend});
+    });
+
+    query2.on('end' () => {
+      return res.json(results);
+    })
   });
 });
 
