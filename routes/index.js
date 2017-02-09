@@ -934,6 +934,7 @@ router.put('/api/v1/attendance/:quarter', urlencodedParser, (req, res, next) => 
           console.log('comparing ' + e.username + ' to ' + sortedUsernames[0]);
           if(e.username == sortedUsernames[0]) {
             present = 1;
+            sortedUsernames.splice(0, 1);
           }
         }
         updateQuarter.push(present);
