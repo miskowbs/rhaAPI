@@ -893,7 +893,6 @@ router.put('/api/v1/attendance/:quarter', urlencodedParser, (req, res, next) => 
   var quarter = req.params.quarter;
 
   var sortedUsernames = req.body.membersToUpdate;
-  console.log(sortedUsernames);
   pg.connect(connectionString, (err, client, done) => {
     if(err) {
       done();
@@ -931,7 +930,7 @@ router.put('/api/v1/attendance/:quarter', urlencodedParser, (req, res, next) => 
             return res.status(500).json({success: false, data: req.params.quarter + ' is not a valid quarter!'});
         }
         if(sortedUsernames.length > 0) {
-          console.log('comparing ' + e.username + ' to ' + sortedUsernames[0]);
+          //have a better check here in case the usernames are empty
           if(e.username == sortedUsernames[0]) {
             present = 1;
             sortedUsernames.splice(0, 1);
@@ -953,7 +952,6 @@ router.put('/api/v1/attendance/:quarter', urlencodedParser, (req, res, next) => 
         }
         client.query(insertAttendance, [newAttendance, e.username]);
       });
-      console.log('Quarter is ' + quarter);
     });
 
     var query2 = client.query("SELECT username, meet_attend from members ORDER BY username ASC;");
