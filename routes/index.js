@@ -908,7 +908,7 @@ router.put('/api/v1/attendance/:quarter', urlencodedParser, (req, res, next) => 
     });
 
     query.on('end', () => {
-      nameAndAttendance.foreach(function (e) {
+      nameAndAttendance.forEach(function (e) {
         var insertAttendance = "UPDATE members SET meet_attend = $1 WHERE username = $2;";
         var present = 0;
         var newAttendance = e.meet_attend;
