@@ -668,31 +668,6 @@ router.put('/api/v1/addition', (req, res, next) => {
   });
 });
 
-/* GET possible balance for a floor */
-router.get('/api/v1/possibleBalance', (req, res, next) => {
-  const results = [];
-
-  pg.connect(connectionString, (err, client, done) => {
-    if(err) {
-      done();
-      console;
-      console.log(err);
-      return res.status(500).json({success: false, data: "You did something so bad you broke the server =("});
-    }
-
-    const query = client.query('SELECT * FROM calc_possible_earnings($1, $2, $3)', ["Blumberg", 10, 10]);
-    
-    query.on('row', (row) => {
-      results.push(row);
-    });
-
-    query.on('end', () => {
-      done();
-      return res.json(results);
-    });
-  });
-});
-
 /*---------------------------- Payments / Expenses Endpoints ------------------------------*/
 /* GET all payments (expenses) */
 router.get('/api/v1/payments', (req, res, next) => {
@@ -909,14 +884,13 @@ router.get('/api/v1/equipment', (req, res, next) => {
   });
 });
 
+
 /*---------------------------- Attendance Endpoints ------------------------------*/
 
 router.put('/api/v1/attendance', urlencodedParser, (req, res, next) => {
   const results = [];
 
   var sortedUsernames = req.body.membersToUpdate;
-
-
   pg.connect(connectionString, (err, client, done) => {
     if(err) {
       done();
@@ -935,13 +909,55 @@ router.put('/api/v1/attendance', urlencodedParser, (req, res, next) => {
       console.log(nameAndAttendance);
     });
   });
+});      
+
+/* GET floor awards value */
+router.post('/api/v1/awardsOnly', (req, res, next) => {
+  const results = [];
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: err});
+    }
+
+    const query = client.query('SELECT * FROM sum_only_awards($1)', [req.body.floorName]);
+    
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
 });
 
-/*
-    var firstQuery = createUpdateQuery(id, 'proposal_id', req.body, 'proposals');
-    const query = client.query('SELECT * FROM proposals WHERE proposal_id = $1', [id]);
-        });
-*/
+/* GET floor expenses value */
+router.post('/api/v1/expensesOnly', (req, res, next) => {
+  const results = [];
+
+  pg.connect(connectionString, (err, client, done) => {
+  if(err) {
+    done();
+    console.log(err);
+    return res.status(500).json({success: false, data: err});
+  }
+
+  const query = client.query('SELECT * FROM sum_only_expenses($1)', [req.body.floorName]);
+  
+  query.on('row', (row) => {
+    results.push(row);
+  });
+
+  query.on('end', () => {
+    done();
+    return res.json(results);
+    });
+  });
+});
 
 /*---------------------------- Floor Expenses Endpoints ------------------------------*/
 
@@ -991,12 +1007,7 @@ router.post('/api/v1/floorExpense', (req, res, next) => {
     client.query('INSERT INTO floorExpenses(floor_id, event_description, amount, turned_in_date, processed_date) VALUES ($1, $2, $3, $4, $5);',
       [data.floor_id, data.event_description, data.amount, data.turned_in_date, data.processed_date]);
 
-    const query = client.query('SELECT * FROM floorExpenses, floorMoney WHERE floorExpenses.event_description = $1 and floorExpenses.amount = $2 and floorExpenses.turned_in_date = $3 and floorExpenses.processed_date = $4 and floorMoney.hall_and_floor = $5 and floorMoney.floorMoney_id = floorExpenses.floor_id', [data.event_description, data.amount, data.turned_in_date, data.processed_date, data.hall_and_floor] )
-
-    console.log("query is: ");
-    console.log(query);
-    console.log("results are: ");
-    console.log(results);
+    const query = client.query('SELECT * FROM floorExpenses, floorMoney WHERE floorExpenses.event_description = $1 and floorExpenses.amount = $2 and floorExpenses.turned_in_date = $3 and floorExpenses.processed_date = $4 and floorMoney.floorMoney_id = floorExpenses.floor_id', [data.event_description, data.amount, data.turned_in_date, data.processed_date] )
 
     query.on('row', (row) => {
       results.push(row);
