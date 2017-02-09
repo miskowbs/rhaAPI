@@ -1147,7 +1147,7 @@ router.post('/api/v1/floorAttendance', (req, res, next) => {
 });
 
 /* GET money used for a given proposal_id */
-router.post('/api/v1/floorAttendance', (req, res, next) => {
+router.post('/api/v1/getMoneyUsed', (req, res, next) => {
   const results = [];
 
   pg.connect(connectionString, (err, client, done) => {
