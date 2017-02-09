@@ -958,7 +958,7 @@ router.put('/api/v1/attendance/:quarter', urlencodedParser, (req, res, next) => 
       results.push({username: row.username, meet_attend: row.meet_attend});
     });
 
-    query2.on('end' () => {
+    query2.on('end', () => {
       return res.json(results);
     })
   });
