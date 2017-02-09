@@ -906,55 +906,7 @@ router.put('/api/v1/attendance', urlencodedParser, (req, res, next) => {
     });
 
     query.on('end', () => {
-      console.log(nameAndAttendance);
-    });
-  });
-});      
-
-/* GET floor awards value */
-router.post('/api/v1/awardsOnly', (req, res, next) => {
-  const results = [];
-
-  pg.connect(connectionString, (err, client, done) => {
-    if(err) {
-      done();
-      console.log(err);
-      return res.status(500).json({success: false, data: err});
-    }
-
-    const query = client.query('SELECT * FROM sum_only_awards($1)', [req.body.floorName]);
-    
-    query.on('row', (row) => {
-      results.push(row);
-    });
-
-    query.on('end', () => {
-      done();
-      return res.json(results);
-    });
-  });
-});
-
-/* GET floor expenses value */
-router.post('/api/v1/expensesOnly', (req, res, next) => {
-  const results = [];
-
-  pg.connect(connectionString, (err, client, done) => {
-  if(err) {
-    done();
-    console.log(err);
-    return res.status(500).json({success: false, data: err});
-  }
-
-  const query = client.query('SELECT * FROM sum_only_expenses($1)', [req.body.floorName]);
-  
-  query.on('row', (row) => {
-    results.push(row);
-  });
-
-  query.on('end', () => {
-    done();
-    return res.json(results);
+      console.log(nameAndAttendance[2].meet_attend);
     });
   });
 });
@@ -1140,6 +1092,54 @@ router.delete('/api/v1/floorExpense/:id', (req, res, next) => {
       return res.json(results);
     });
 
+  });
+});
+
+/* GET floor awards value */
+router.post('/api/v1/awardsOnly', (req, res, next) => {
+  const results = [];
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: err});
+    }
+
+    const query = client.query('SELECT * FROM sum_only_awards($1)', [req.body.floorName]);
+    
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
+/* GET floor expenses value */
+router.post('/api/v1/expensesOnly', (req, res, next) => {
+  const results = [];
+
+  pg.connect(connectionString, (err, client, done) => {
+  if(err) {
+    done();
+    console.log(err);
+    return res.status(500).json({success: false, data: err});
+  }
+
+  const query = client.query('SELECT * FROM sum_only_expenses($1)', [req.body.floorName]);
+  
+  query.on('row', (row) => {
+    results.push(row);
+  });
+
+  query.on('end', () => {
+    done();
+    return res.json(results);
+    });
   });
 });
 
