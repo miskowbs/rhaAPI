@@ -930,6 +930,7 @@ router.put('/api/v1/attendance/:quarter', urlencodedParser, (req, res, next) => 
             return res.status(500).json({success: false, data: req.params.quarter + ' is not a valid quarter!'});
         }
         if(sortedUsernames.length > 0) {
+          console.log('comparing ' + e.username + ' to ' + sortedUsernames[0]);
           if(e.username == sortedUsernames[0]) {
             present = 1;
           }
@@ -950,6 +951,7 @@ router.put('/api/v1/attendance/:quarter', urlencodedParser, (req, res, next) => 
         }
         client.query(insertAttendance, [newAttendance, e.username]);
       });
+      console.log('Quarter is ' + quarter);
     });
 
     var query2 = client.query("SELECT username, meet_attend from members ORDER BY username ASC;");
