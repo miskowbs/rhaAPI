@@ -907,6 +907,7 @@ router.put('/api/v1/attendance', urlencodedParser, (req, res, next) => {
 
     query.on('end', () => {
       console.log(nameAndAttendance[2].meet_attend);
+      return res.json(nameAndAttendance);
     });
   });
 });
