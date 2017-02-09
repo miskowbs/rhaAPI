@@ -893,6 +893,7 @@ router.put('/api/v1/attendance/:quarter', urlencodedParser, (req, res, next) => 
   var quarter = req.params.quarter;
 
   var sortedUsernames = req.body.membersToUpdate;
+  console.log(sortedUsernames);
   pg.connect(connectionString, (err, client, done) => {
     if(err) {
       done();
