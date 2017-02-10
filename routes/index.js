@@ -933,7 +933,12 @@ router.put('/api/v1/attendance/:quarter', urlencodedParser, (req, res, next) => 
           //have a better check here in case the usernames are empty
           if(e.username == sortedUsernames[0]) {
             present = 1;
-            sortedUsernames.splice(0, 1);
+            console.log(e.username + ' was present.');
+            if(sortedUsernames.length == 1) {
+              sortedUsernames = [];
+            } else {
+              sortedUsernames.splice(0, 1);
+            }
           }
         }
         updateQuarter.push(present);
