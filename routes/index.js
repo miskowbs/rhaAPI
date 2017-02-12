@@ -950,7 +950,7 @@ router.put('/api/v1/attendance/:quarter', urlencodedParser, (req, res, next) => 
   });
 });
 
-@@ -1112,6 +1151,55 @@ router.delete('/api/v1/floorExpense/:id', (req, res, next) => {
+router.delete('/api/v1/floorExpense/:id', (req, res, next) => {
       done();
       return res.json(results);
     });
