@@ -222,7 +222,7 @@ router.get('/api/v1/members', (req, res, next) => {
       return res.status(500).json({success: false, data: "You did something so bad you broke the server =("});
     }
 
-    const query = client.query('SELECT user_id, username, firstname, lastname, hall, image, memberType, cm, phone_number, room_number, active FROM members ORDER BY lastname ASC;');
+    const query = client.query('SELECT user_id, username, firstname, lastname, hall, image, memberType, cm, phone_number, room_number, active, meet_attend FROM members ORDER BY hall ASC, lastname ASC;');
     
     query.on('row', (row) => {
       results.push(row);
@@ -884,51 +884,90 @@ router.get('/api/v1/equipment', (req, res, next) => {
   });
 });
 
-/* GET floor awards value */
-router.post('/api/v1/awardsOnly', (req, res, next) => {
+
+/*---------------------------- Attendance Endpoints ------------------------------*/
+
+router.put('/api/v1/attendance/:quarter', urlencodedParser, (req, res, next) => {
   const results = [];
 
+  var quarter = req.params.quarter;
+
+  var sortedUsernames = req.body.membersToUpdate;
   pg.connect(connectionString, (err, client, done) => {
     if(err) {
       done();
       console.log(err);
-      return res.status(500).json({success: false, data: err});
+      return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
     }
+    var nameAndAttendance = [];
 
-    const query = client.query('SELECT * FROM sum_only_awards($1)', [req.body.floorName]);
-    
+    var query = client.query("SELECT username, meet_attend from members ORDER BY username ASC;");
+
     query.on('row', (row) => {
-      results.push(row);
+      nameAndAttendance.push({username: row.username, meet_attend: row.meet_attend});
     });
 
     query.on('end', () => {
-      done();
+      nameAndAttendance.forEach(function (e) {
+        var insertAttendance = "UPDATE members SET meet_attend = $1 WHERE username = $2;";
+        var present = 0;
+        var newAttendance = e.meet_attend;
+        var updateQuarter = [];
+        switch(quarter) {
+          case 'Q1':
+            updateQuarter = e.meet_attend.Q1;
+            delete newAttendance.Q1;
+            break;
+          case 'Q2':
+            updateQuarter = e.meet_attend.Q2;
+            delete newAttendance.Q2;
+            break;
+          case 'Q3':
+            updateQuarter = e.meet_attend.Q3;
+            delete newAttendance.Q3;
+            break;
+          default: 
+            return res.status(500).json({success: false, data: req.params.quarter + ' is not a valid quarter!'});
+        }
+        if(sortedUsernames.length > 0) {
+          //have a better check here in case the usernames are empty
+          if(e.username == sortedUsernames[0]) {
+            present = 1;
+            console.log(e.username + ' was present.');
+            if(sortedUsernames.length == 1) {
+              sortedUsernames = [];
+            } else {
+              sortedUsernames.splice(0, 1);
+            }
+          }
+        }
+        updateQuarter.push(present);
+        switch(quarter) {
+          case 'Q1':
+            newAttendance.Q1 = updateQuarter;
+            break;
+          case 'Q2':
+            newAttendance.Q2 = updateQuarter;
+            break;
+          case 'Q3':
+            newAttendance.Q3 = updateQuarter;
+            break;
+          default: 
+            return res.status(500).json({success: false, data: req.params.quarter + ' is not a valid quarter!'});
+        }
+        client.query(insertAttendance, [newAttendance, e.username]);
+      });
+    });
+
+    var query2 = client.query("SELECT username, meet_attend from members ORDER BY username ASC;");
+
+    query2.on('row', (row) => {
+      results.push({username: row.username, meet_attend: row.meet_attend});
+    });
+
+    query2.on('end', () => {
       return res.json(results);
-    });
-  });
-});
-
-/* GET floor expenses value */
-router.post('/api/v1/expensesOnly', (req, res, next) => {
-  const results = [];
-
-  pg.connect(connectionString, (err, client, done) => {
-    if(err) {
-      done();
-      console.log(err);
-      return res.status(500).json({success: false, data: err});
-    }
-
-    const query = client.query('SELECT * FROM sum_only_expenses($1)', [req.body.floorName]);
-    
-    query.on('row', (row) => {
-      results.push(row);
-    });
-
-    query.on('end', () => {
-      done();
-      return res.json(results);
-    });
+    })
   });
 });
 
@@ -1111,6 +1150,55 @@ router.delete('/api/v1/floorExpense/:id', (req, res, next) => {
     query.on('end', () => {
       done();
       return res.json(results);
+    });
+
+  });
+});
+
+/* GET floor awards value */
+router.post('/api/v1/awardsOnly', (req, res, next) => {
+  const results = [];
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: err});
+    }
+
+    const query = client.query('SELECT * FROM sum_only_awards($1)', [req.body.floorName]);
+    
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
+/* GET floor expenses value */
+router.post('/api/v1/expensesOnly', (req, res, next) => {
+  const results = [];
+
+  pg.connect(connectionString, (err, client, done) => {
+  if(err) {
+    done();
+    console.log(err);
+    return res.status(500).json({success: false, data: err});
+  }
+
+  const query = client.query('SELECT * FROM sum_only_expenses($1)', [req.body.floorName]);
+  
+  query.on('row', (row) => {
+    results.push(row);
+  });
+
+  query.on('end', () => {
+    done();
+    return res.json(results);
     });
   });
 });
