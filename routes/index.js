@@ -943,7 +943,7 @@ router.put('/api/v1/attendance/:quarter', urlencodedParser, (req, res, next) => 
         }
         updateQuarter.push(present);
         switch(quarter) {
-          case 'Q1':
+          case 'Q1':   
             newAttendance.Q1 = updateQuarter;
             break;
           case 'Q2':
