@@ -1170,6 +1170,31 @@ router.post('/api/v1/getMoneyUsed', (req, res, next) => {
   });
 });
 
+
+/* Just calls the update_floor_money() function */
+router.get('/api/v1/updateFloorMoney', (req, res, next) => {
+  const results = [];
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: err});
+    }
+
+    const query = client.query('SELECT * FROM update_floor_money()');
+    
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
 /*---------------------------- Query Help ------------------------------*/
 
 /* Create an UpdateQuery */
