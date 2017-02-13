@@ -870,14 +870,12 @@ router.put('/api/v1/attendance/:quarter', urlencodedParser, (req, res, next) => 
     if(err) {
       done();
       console.log(err);
-      return res.status(500).json({success: false, data: err});
       return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
     }
     var nameAndAttendance = [];
 
     var query = client.query("SELECT username, meet_attend from members ORDER BY username ASC;");
 
-    const query = client.query('SELECT * FROM sum_only_expenses($1)', [req.body.floorName]);
     
     query.on('row', (row) => {
       results.push(row);
@@ -946,17 +944,9 @@ router.put('/api/v1/attendance/:quarter', urlencodedParser, (req, res, next) => 
     query2.on('end', () => {
       return res.json(results);
     });
-    })
   });
 });
 
-router.delete('/api/v1/floorExpense/:id', (req, res, next) => {
-      done();
-      return res.json(results);
-    });
-
-  });
-});
 
 /* -------------------------- Expenses Endpoints -----------------------------------*/
 
@@ -989,16 +979,24 @@ router.post('/api/v1/expensesOnly', (req, res, next) => {
   const results = [];
 
   pg.connect(connectionString, (err, client, done) => {
-  if(err) {
-    done();
-    console.log(err);
-    return res.status(500).json({success: false, data: err});
-  }
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: err});
+    }
 
-  const query = client.query('SELECT * FROM sum_only_expenses($1)', [req.body.floorName]);
+    const query = client.query('SELECT * FROM sum_only_expenses($1)', [req.body.floorName]);
   
-  query.on('row', (row) => {
+    query.on('row', (row) => {
+      results.push(row);
+    });
 
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
 
 /*---------------------------- Floor Expenses Endpoints ------------------------------*/
 
