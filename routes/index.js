@@ -1261,6 +1261,32 @@ router.get('/api/v1/updateFloorMoney', (req, res, next) => {
   });
 });
 
+/*---------------------------- Equipment Endpoints ------------------------------*/
+
+/* GET all equipment data */
+router.get('/api/v1/equipment', (req, res, next) => {
+  const results = [];
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: err});
+    }
+
+    const query = client.query('SELECT equipmentid, equipmentname, equipmentdescripton, rentaltimeindays, equipmentEmbed FROM equipment;');
+    
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
 /*---------------------------- Query Help ------------------------------*/
 
 /* Create an UpdateQuery */
