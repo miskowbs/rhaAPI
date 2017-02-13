@@ -1274,7 +1274,7 @@ router.get('/api/v1/equipment', (req, res, next) => {
       return res.status(500).json({success: false, data: err});
     }
 
-    const query = client.query('SELECT equipmentid, equipmentname, equipmentdescripton, rentaltimeindays, equipmentEmbed FROM equipment;');
+    const query = client.query('SELECT equipmentid, equipmentname, equipmentdescription, rentaltimeindays, equipmentEmbed FROM equipment;');
     
     query.on('row', (row) => {
       results.push(row);
