@@ -1242,22 +1242,22 @@ router.put('/api/v1/infoText/:id', (req, res, next) => {
     var colValues = [];
     Object.keys(req.body).filter(function (key) {
       colValues.push(req.body[key]);
-    });//This is new
+    });  
 
     client.query(firstQuery, colValues);
 
     const query = client.query('SELECT * FROM infoText WHERE info_text_id = $1', [id]) ;
-//This is new
-    query.on('row', (row) => {//This is new
-      results.push(row);//This is new
-    });//This is new
-//This is new
-    query.on('end', () => {//This is new
-      done();//This is new
-      return res.json(results);//This is new
-    });//This is new
-  });//This is new
-});//This is new
+  
+    query.on('row', (row) => {  
+      results.push(row);  
+    });  
+  
+    query.on('end', () => {  
+      done();  
+      return res.json(results);  
+    });
+  });
+});
 
 /*---------------------------- Query Help ------------------------------*/
 
