@@ -1040,7 +1040,6 @@ router.get('/api/v1/floorExpense/:id', (req, res, next) => {
   pg.connect(connectionString, (err, client, done) => {
     if(err) {
       done();
-      console;
       console.log(err);
       return res.status(500).json({success: false, data: "You did something so bad you broke the server =("});
     }
@@ -1194,6 +1193,71 @@ router.get('/api/v1/updateFloorMoney', (req, res, next) => {
     });
   });
 });
+
+
+/*---------------------------- Floor Expenses Endpoints ------------------------------*/
+
+
+/* GET an InfoText */
+router.get('/api/v1/infoText/:id', (req, res, next) => {
+  const results = [];
+
+  const id = req.params.id;
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: "You did something so bad you broke the server =("});
+    }
+
+    const query = client.query('SELECT * FROM infoText WHERE info_text_id = $1;', [id]);
+    
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+}); 
+
+/* PUT modify a payment (expense) */
+router.put('/api/v1/infoText/:id', (req, res, next) => {
+  const results = [];
+
+  const id = req.params.id;
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
+    }
+
+    var firstQuery = createUpdateQuery(id, 'info_text_id', req.body, 'infoText'); 
+
+    var colValues = [];
+    Object.keys(req.body).filter(function (key) {
+      colValues.push(req.body[key]);
+    });//This is new
+
+    client.query(firstQuery, colValues);
+
+    const query = client.query('SELECT * FROM infoText WHERE info_text_id = $1', [id]) ;
+//This is new
+    query.on('row', (row) => {//This is new
+      results.push(row);//This is new
+    });//This is new
+//This is new
+    query.on('end', () => {//This is new
+      done();//This is new
+      return res.json(results);//This is new
+    });//This is new
+  });//This is new
+});//This is new
 
 /*---------------------------- Query Help ------------------------------*/
 
