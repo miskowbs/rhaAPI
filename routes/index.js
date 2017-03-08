@@ -1306,7 +1306,7 @@ router.get('/api/v1/infoText/:id', (req, res, next) => {
 
     query.on('end', () => {
       done();
-      return res.json(results);
+      return res.json(results[0]);
     });
   });
 }); 
