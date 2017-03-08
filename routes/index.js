@@ -1311,7 +1311,7 @@ router.get('/api/v1/infoText/:id', (req, res, next) => {
   });
 }); 
 
-/* PUT modify a payment (expense) */
+/* PUT modify an InfoText */
 router.put('/api/v1/infoText/:id', (req, res, next) => {
   const results = [];
 
