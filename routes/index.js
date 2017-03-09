@@ -423,7 +423,7 @@ router.delete('/api/v1/member/:id', (req, res, next) => {
       return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
     }
 
-    const query = client.query('DELETE FROM member WHERE user_id = $1', [id]);
+    const query = client.query('DELETE FROM members WHERE user_id = $1', [id]);
 
     query.on('end', () => {
       done();
