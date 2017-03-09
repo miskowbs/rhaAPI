@@ -423,7 +423,7 @@ router.delete('/api/v1/member/:id', (req, res, next) => {
       return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
     }
 
-    const query = client.query('DELETE FROM member WHERE user_id = $1', [id]);
+    const query = client.query('DELETE FROM members WHERE user_id = $1', [id]);
 
     query.on('end', () => {
       done();
@@ -1106,7 +1106,6 @@ router.get('/api/v1/floorExpense/:id', (req, res, next) => {
   pg.connect(connectionString, (err, client, done) => {
     if(err) {
       done();
-      console;
       console.log(err);
       return res.status(500).json({success: false, data: "You did something so bad you broke the server =("});
     }
@@ -1124,7 +1123,7 @@ router.get('/api/v1/floorExpense/:id', (req, res, next) => {
   });
 });
 
-/* PUT modify a payment (expense) */
+/* PUT modify a payment (floorExpense) */
 router.put('/api/v1/floorExpense/:id', (req, res, next) => {
   const results = [];
 
@@ -1266,8 +1265,7 @@ router.get('/api/v1/updateFloorMoney', (req, res, next) => {
 /* GET all equipment data */
 router.get('/api/v1/equipment', (req, res, next) => {
   const results = [];
-
-  pg.connect(connectionString, (err, client, done) => {
+    pg.connect(connectionString, (err, client, done) => {
     if(err) {
       done();
       console.log(err);
@@ -1275,7 +1273,6 @@ router.get('/api/v1/equipment', (req, res, next) => {
     }
 
     const query = client.query('SELECT equipmentid, equipmentname, equipmentdescription, rentaltimeindays, equipmentEmbed FROM equipment;');
-    
     query.on('row', (row) => {
       results.push(row);
     });
@@ -1283,6 +1280,67 @@ router.get('/api/v1/equipment', (req, res, next) => {
     query.on('end', () => {
       done();
       return res.json(results);
+    });
+  });
+}); 
+
+
+/*---------------------------- InfoText Endpoints ------------------------------*/
+
+/* GET an InfoText */
+router.get('/api/v1/infoText/:id', (req, res, next) => {
+  const results = [];
+
+  const id = req.params.id;
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: "You did something so bad you broke the server =("});
+    }
+
+    const query = client.query('SELECT * FROM infoText WHERE info_text_id = $1;', [id]);
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results[0]);
+    });
+  });
+}); 
+
+/* PUT modify an InfoText */
+router.put('/api/v1/infoText/:id', (req, res, next) => {
+  const results = [];
+
+  const id = req.params.id;
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
+    }
+    var firstQuery = createUpdateQuery(id, 'info_text_id', req.body, 'infoText'); 
+    
+    var colValues = [];
+    Object.keys(req.body).filter(function (key) {
+      colValues.push(req.body[key]);
+    });  
+
+    client.query(firstQuery, colValues);
+
+    const query = client.query('SELECT * FROM infoText WHERE info_text_id = $1', [id]) ;
+  
+    query.on('row', (row) => {  
+      results.push(row);  
+    });  
+  
+    query.on('end', () => {  
+      done();  
+      return res.json(results);  
     });
   });
 });
