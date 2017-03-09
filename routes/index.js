@@ -1325,7 +1325,7 @@ router.put('/api/v1/infoText/:id', (req, res, next) => {
     }
 
     var firstQuery = createUpdateQuery(id, 'info_text_id', req.body, 'infoText'); 
-
+    console.log(firstQuery);
     var colValues = [];
     Object.keys(req.body).filter(function (key) {
       colValues.push(req.body[key]);
