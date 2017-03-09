@@ -1323,7 +1323,7 @@ router.put('/api/v1/infoText/:id', (req, res, next) => {
       console.log(err);
       return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
     }
-
+    console.log(req.body);
     var firstQuery = createUpdateQuery(id, 'info_text_id', req.body, 'infoText'); 
     console.log(firstQuery);
     var colValues = [];
