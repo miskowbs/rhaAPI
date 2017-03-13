@@ -861,6 +861,7 @@ router.post('/api/v1/proposal', urlencodedParser, function(req, res, next) {
 /*---------------------------- Attendance Endpoints ------------------------------*/
 
 router.get('/api/v1/attendance/undo', (req, res, next) => {
+  const results = "It worked!";
 
   pg.connect(connectionString, (err, client, done) => {
     if(err) {
@@ -888,6 +889,7 @@ router.get('/api/v1/attendance/undo', (req, res, next) => {
 
     query4.on('end', () => {
       done();
+      return res.json(results);
     });
   });
 });
