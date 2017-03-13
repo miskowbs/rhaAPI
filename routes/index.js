@@ -866,8 +866,9 @@ router.get('/api/v1/attendance/undo', (req, res, next) => {
     if(err) {
       done();
       console.log(err);
-      return res.status(500).json({success: false, data: "You broke it, son"});
+      return res.status(500).json({success: false, data: err});
     }
+
     var query1 = client.query("COPY Rentals TO '/tmp/rentalsBackup.csv' DELIMITER ',' CSV HEADER;");
     var query2 = client.query("TRUNCATE Members CASCADE;");
     var query3 = client.query("COPY Members FROM '/tmp/membersBackup.csv' DELIMITER ',' CSV HEADER;");
