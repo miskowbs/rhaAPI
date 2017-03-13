@@ -860,7 +860,7 @@ router.post('/api/v1/proposal', urlencodedParser, function(req, res, next) {
 
 /*---------------------------- Attendance Endpoints ------------------------------*/
 
-router.post('/api/v1/attendance/undo', urlencodedParser, (req, res, next) => {
+router.get('/api/v1/attendance/undo', (req, res, next) => {
   var query1 = client.query("COPY Rentals TO '/tmp/rentalsBackup.csv' DELIMITER ',' CSV HEADER;");
   var query2 = client.query("TRUNCATE Members CASCADE;");
   var query3 = client.query("COPY Members FROM '/tmp/membersBackup.csv' DELIMITER ',' CSV HEADER;");
