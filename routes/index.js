@@ -1431,6 +1431,7 @@ router.get('/api/v1/photoGalleryRestricted', (req, res, next) => {
   });
 });
 
+router.post('/api/v1/photoGallery', (req, res, next) => {
   const results= [];
 
   const data = {path_to_photo: req.body.path_to_photo, approved: req.body.approved};
@@ -1463,6 +1464,7 @@ router.get('/api/v1/photoGalleryRestricted', (req, res, next) => {
   });
 });
 
+router.delete('/api/v1/phtoGallery/:id', (req, res, next) => {
   const results = [];
 
   const event_id = req.params.event_id;
@@ -1475,8 +1477,11 @@ router.get('/api/v1/photoGalleryRestricted', (req, res, next) => {
       return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
     }
 
+    var firstQuery = 'DELETE FROM photoGallery WHERE photo_gallery_id = $1;'
 
+    client.query(firstQuery, [id]);
 
+    const query = client.query('SELECT * FROM photoGallery WHERE photo_gallery_id = $1', [id]);
 
     query.on('row', (row) => {
       results.push(row);
