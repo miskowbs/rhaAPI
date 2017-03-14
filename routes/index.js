@@ -860,6 +860,40 @@ router.post('/api/v1/proposal', urlencodedParser, function(req, res, next) {
 
 /*---------------------------- Attendance Endpoints ------------------------------*/
 
+router.get('/api/v1/attendance/undo', (req, res, next) => {
+  const results = "It worked!";
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: err});
+    }
+
+    var query1 = client.query("COPY Rentals TO '/tmp/rentalsBackup.csv' DELIMITER ',' CSV HEADER;");
+    var query2 = client.query("TRUNCATE Members CASCADE;");
+    var query3 = client.query("COPY Members FROM '/tmp/membersBackup.csv' DELIMITER ',' CSV HEADER;");
+    var query4 = client.query("COPY Rentals FROM '/tmp/rentalsBackup.csv' DELIMITER ',' CSV HEADER;");
+
+    query1.on('end', () => {
+      done();
+    });
+
+    query2.on('end', () => {
+      done();
+    });
+
+    query3.on('end', () => {
+      done();
+    });
+
+    query4.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
 router.put('/api/v1/attendance/:quarter', urlencodedParser, (req, res, next) => {
   const results = [];
 
@@ -875,7 +909,11 @@ router.put('/api/v1/attendance/:quarter', urlencodedParser, (req, res, next) => 
     var nameAndAttendance = [];
 
     var query = client.query("SELECT username, meet_attend from members ORDER BY username ASC;");
+    var backup = client.query("COPY Members TO '/tmp/membersBackup.csv' DELIMITER ',' CSV HEADER;");
 
+    backup.on('end', () => {
+      done(); //For catching errors if copy statement is wrong
+    });
     
     query.on('row', (row) => {
       results.push(row);
