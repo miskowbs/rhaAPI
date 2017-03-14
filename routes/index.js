@@ -1383,6 +1383,112 @@ router.put('/api/v1/infoText/:id', (req, res, next) => {
   });
 });
 
+/*------------------------ Gallery Endpoints -----------------------------*/
+
+router.get('/api/v1/photoGalleryAll', (req, res, next) => {
+  const results = [];
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: err});
+    }
+
+    const query = client.query('SELECT * FROM photoGallery');
+    
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
+router.get('/api/v1/photoGalleryRestricted', (req, res, next) => {
+  const results = [];
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: err});
+    }
+
+    const query = client.query('SELECT * FROM photoGallery WHERE approved = \'approved\';');
+    
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
+  const results= [];
+
+  const data = {path_to_photo: req.body.path_to_photo, approved: req.body.approved};
+
+  if(data.path_to_photo == null || data.approved == null) {
+    return res.status(400).json({success: false, data: "This is not a properly formed gallery photo object."});
+  }
+
+  pg.connect(connectionString, (err, client, done) => {
+
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: err});
+    }
+
+    client.query('INSERT INTO photoGallery (path_to_photo, approved) VALUES ($1, $2);',
+      [data.path_to_photo, data.approved]);
+
+    const query = client.query('SELECT * FROM photoGallery WHERE path_to_photo = $1', [data.path_to_photo]);
+
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
+  const results = [];
+
+  const event_id = req.params.event_id;
+  const member_id = req.params.member_id;
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
+    }
+
+
+
+
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
 /*---------------------------- Query Help ------------------------------*/
 
 /* Create an UpdateQuery */
