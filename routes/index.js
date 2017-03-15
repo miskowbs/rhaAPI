@@ -1470,6 +1470,7 @@ router.post('/api/v1/photoGallery', (req, res, next) => {
 
   const data = {path_to_photo: req.body.path_to_photo, approved: req.body.approved};
 
+  console.log(req.body);
   if(data.path_to_photo == null || data.approved == null) {
     return res.status(400).json({success: false, data: "This is not a properly formed gallery photo object."});
   }
