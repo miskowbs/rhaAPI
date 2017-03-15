@@ -1498,7 +1498,7 @@ router.post('/api/v1/photoGallery', (req, res, next) => {
   });
 });
 
-router.delete('/api/v1/phtoGallery/:id', (req, res, next) => {
+router.delete('/api/v1/photoGallery/:id', (req, res, next) => {
   const results = [];
 
   const event_id = req.params.event_id;
