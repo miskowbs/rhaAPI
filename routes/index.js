@@ -1484,8 +1484,13 @@ router.post('/api/v1/photoGallery', (req, res, next) => {
 
     var firstQuery = createNewEntryQuery(req.body, 'photogallery');
     console.log(firstQuery);
-    client.query(firstQuery);
-      [data.path_to_photo, data.approved]);
+
+    var colValues = [];
+    Object.keys(req.body).filter(function (key) {
+      colValues.push(req.body[key]);
+    });
+
+    client.query(firstQuery, colValues);
 
     const query = client.query('SELECT * FROM photoGallery WHERE path_to_photo = $1', [data.path_to_photo]);
 
