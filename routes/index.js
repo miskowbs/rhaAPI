@@ -1501,8 +1501,7 @@ router.post('/api/v1/photoGallery', (req, res, next) => {
 router.delete('/api/v1/photoGallery/:id', (req, res, next) => {
   const results = [];
 
-  const event_id = req.params.event_id;
-  const member_id = req.params.member_id;
+  const id = req.params.id;
 
   pg.connect(connectionString, (err, client, done) => {
     if(err) {
