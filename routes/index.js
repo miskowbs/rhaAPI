@@ -1482,7 +1482,9 @@ router.post('/api/v1/photoGallery', (req, res, next) => {
       return res.status(500).json({success: false, data: err});
     }
 
-    client.query('INSERT INTO photoGallery (path_to_photo, approved) VALUES ($1, $2);',
+    var firstQuery = createNewEntryQuery(req.body, 'photogallery');
+    console.log(firstQuery);
+    client.query(firstQuery);
       [data.path_to_photo, data.approved]);
 
     const query = client.query('SELECT * FROM photoGallery WHERE path_to_photo = $1', [data.path_to_photo]);
