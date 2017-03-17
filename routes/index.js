@@ -1383,6 +1383,156 @@ router.put('/api/v1/infoText/:id', (req, res, next) => {
   });
 });
 
+/*------------------------ Gallery Endpoints -----------------------------*/
+
+router.get('/api/v1/photoGalleryAll', (req, res, next) => {
+  const results = [];
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: err});
+    }
+
+    const query = client.query('SELECT * FROM photoGallery');
+    
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
+router.get('/api/v1/photoGalleryRestricted', (req, res, next) => {
+  const results = [];
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: err});
+    }
+
+    const query = client.query('SELECT * FROM photoGallery WHERE approved = \'approved\';');
+    
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
+router.put('/api/v1/photoGallery/:id', (req, res, next) => {
+  const results = [];
+
+  const id = req.params.id;
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
+    }
+
+    var firstQuery = createUpdateQuery(id, 'photo_gallery_id', req.body, 'photoGallery');
+
+    var colValues = [];
+    Object.keys(req.body).filter(function (key) {
+      colValues.push(req.body[key]);
+    });
+
+    client.query(firstQuery, colValues);
+
+    const query = client.query('SELECT * FROM photoGallery WHERE photo_gallery_id = $1', [id]);
+
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
+router.post('/api/v1/photoGallery', (req, res, next) => {
+  const results= [];
+
+  const data = {path_to_photo: req.body.path_to_photo, approved: req.body.approved};
+
+  if(data.path_to_photo == null || data.approved == null) {
+    return res.status(400).json({success: false, data: "This is not a properly formed gallery photo object."});
+  }
+
+  pg.connect(connectionString, (err, client, done) => {
+
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: err});
+    }
+
+    var firstQuery = createNewEntryQuery(req.body, 'photogallery');
+
+    var colValues = [];
+    Object.keys(req.body).filter(function (key) {
+      colValues.push(req.body[key]);
+    });
+
+    client.query(firstQuery, colValues);
+
+    const query = client.query('SELECT * FROM photoGallery WHERE path_to_photo = $1', [data.path_to_photo]);
+
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
+router.delete('/api/v1/photoGallery/:id', (req, res, next) => {
+  const results = [];
+
+  const id = req.params.id;
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
+    }
+
+    var firstQuery = 'DELETE FROM photoGallery WHERE photo_gallery_id = $1;'
+
+    client.query(firstQuery, [id]);
+
+    const query = client.query('SELECT * FROM photoGallery WHERE photo_gallery_id = $1', [id]);
+
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
 /*---------------------------- Query Help ------------------------------*/
 
 /* Create an UpdateQuery */
