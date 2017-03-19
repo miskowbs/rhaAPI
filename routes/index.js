@@ -20,7 +20,7 @@ router.get('/api/v1/events', (req, res, next) => {
       return res.status(500).json({success: false, data: err});
     }
 
-    const query = client.query('SELECT proposal_id, proposal_name, event_date, event_signup_close, event_signup_open, cost_to_attendee, image_path, description, attendees FROM proposals WHERE approved = true AND event_date >= CURRENT_DATE ORDER BY event_date ASC;');
+    const query = client.query('SELECT * FROM proposals WHERE approved = true AND event_date >= CURRENT_DATE ORDER BY event_date ASC;');
     
     query.on('row', (row) => {
       results.push(row);
@@ -69,7 +69,7 @@ router.get('/api/v1/pastEvents', (req, res, next) => {
       return res.status(500).json({success: false, data: "You did something so bad you broke the server =("});
     }
 
-    const query = client.query('SELECT proposal_id, proposal_name, event_date, event_signup_close, event_signup_open, cost_to_attendee, image_path, description, attendees FROM proposals WHERE approved = true AND event_date < CURRENT_DATE AND event_signup_open IS NOT NULL AND event_signup_close IS NOT NULL AND event_date IS NOT NULL ORDER BY event_date DESC;');
+    const query = client.query('SELECT * FROM proposals WHERE approved = true AND event_date < CURRENT_DATE AND event_signup_open IS NOT NULL AND event_signup_close IS NOT NULL AND event_date IS NOT NULL ORDER BY event_date DESC;');
     
     query.on('row', (row) => {
       results.push(row);
@@ -96,7 +96,7 @@ router.get('/api/v1/events/:id', (req, res, next) => {
       return res.status(500).json({success: false, data: "You did something so bad you broke the server =("});
     }
 
-    const query = client.query('SELECT proposal_id, proposal_name, event_date, event_signup_close, event_signup_open, cost_to_attendee, image_path, description, attendees FROM proposals WHERE proposal_id = $1;', [id]);
+    const query = client.query('SELECT * FROM proposals WHERE proposal_id = $1;', [id]);
     
     query.on('row', (row) => {
       results.push(row);
@@ -222,7 +222,7 @@ router.get('/api/v1/members', (req, res, next) => {
       return res.status(500).json({success: false, data: "You did something so bad you broke the server =("});
     }
 
-    const query = client.query('SELECT user_id, username, firstname, lastname, hall, image, memberType, cm, phone_number, room_number, active, meet_attend FROM members ORDER BY hall ASC, lastname ASC;');
+    const query = client.query('SELECT * FROM members ORDER BY hall ASC, lastname ASC;');
 
     query.on('row', (row) => {
       results.push(row);
@@ -280,7 +280,7 @@ router.get('/api/v1/officers', (req, res, next) => {
       return res.status(500).json({success: false, data: "You did something so bad you broke the server =("});
     }
 
-    const query = client.query('SELECT user_id, username, firstname, lastname, hall, image, memberType, cm, phone_number, room_number FROM members WHERE memberType IS NOT NULL ORDER BY lastname ASC;');
+    const query = client.query('SELECT * FROM members WHERE memberType IS NOT NULL ORDER BY lastname ASC;');
     
     query.on('row', (row) => {
       results.push(row);
@@ -375,7 +375,7 @@ router.get('/api/v1/activeMembers', (req, res, next) => {
       return res.status(500).json({success: false, data: "You did something so bad you broke the server =("});
     }
 
-    const query = client.query('SELECT user_id, username, firstname, lastname, hall, image, memberType, cm, phone_number, room_number FROM members WHERE active IS TRUE ORDER BY lastname ASC;');
+    const query = client.query('SELECT * FROM members WHERE active IS TRUE ORDER BY lastname ASC;');
     
     query.on('row', (row) => {
       results.push(row);
@@ -1310,7 +1310,7 @@ router.get('/api/v1/equipment', (req, res, next) => {
       return res.status(500).json({success: false, data: err});
     }
 
-    const query = client.query('SELECT equipmentid, equipmentname, equipmentdescription, rentaltimeindays, equipmentEmbed FROM equipment;');
+    const query = client.query('SELECT * FROM equipment;');
     query.on('row', (row) => {
       results.push(row);
     });
