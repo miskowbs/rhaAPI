@@ -20,7 +20,7 @@ router.get('/api/v1/events', (req, res, next) => {
       return res.status(500).json({success: false, data: err});
     }
 
-    const query = client.query('SELECT proposal_id, proposal_name, event_date, event_signup_close, event_signup_open, cost_to_attendee, image_path, description, attendees FROM proposals WHERE approved = true AND event_date >= CURRENT_DATE ORDER BY event_date ASC;');
+    const query = client.query('SELECT * FROM proposals WHERE approved = true AND event_date >= CURRENT_DATE ORDER BY event_date ASC;');
     
     query.on('row', (row) => {
       results.push(row);
@@ -69,7 +69,7 @@ router.get('/api/v1/pastEvents', (req, res, next) => {
       return res.status(500).json({success: false, data: "You did something so bad you broke the server =("});
     }
 
-    const query = client.query('SELECT proposal_id, proposal_name, event_date, event_signup_close, event_signup_open, cost_to_attendee, image_path, description, attendees FROM proposals WHERE approved = true AND event_date < CURRENT_DATE AND event_signup_open IS NOT NULL AND event_signup_close IS NOT NULL AND event_date IS NOT NULL ORDER BY event_date DESC;');
+    const query = client.query('SELECT * FROM proposals WHERE approved = true AND event_date < CURRENT_DATE AND event_signup_open IS NOT NULL AND event_signup_close IS NOT NULL AND event_date IS NOT NULL ORDER BY event_date DESC;');
     
     query.on('row', (row) => {
       results.push(row);
@@ -222,7 +222,7 @@ router.get('/api/v1/members', (req, res, next) => {
       return res.status(500).json({success: false, data: "You did something so bad you broke the server =("});
     }
 
-    const query = client.query('SELECT user_id, username, firstname, lastname, hall, image, memberType, cm, phone_number, room_number, active, meet_attend FROM members ORDER BY hall ASC, lastname ASC;');
+    const query = client.query('SELECT * FROM members ORDER BY hall ASC, lastname ASC;');
 
     query.on('row', (row) => {
       results.push(row);
@@ -280,7 +280,7 @@ router.get('/api/v1/officers', (req, res, next) => {
       return res.status(500).json({success: false, data: "You did something so bad you broke the server =("});
     }
 
-    const query = client.query('SELECT user_id, username, firstname, lastname, hall, image, memberType, cm, phone_number, room_number FROM members WHERE memberType IS NOT NULL ORDER BY lastname ASC;');
+    const query = client.query('SELECT * FROM members WHERE memberType IS NOT NULL ORDER BY lastname ASC;');
     
     query.on('row', (row) => {
       results.push(row);
@@ -375,7 +375,7 @@ router.get('/api/v1/activeMembers', (req, res, next) => {
       return res.status(500).json({success: false, data: "You did something so bad you broke the server =("});
     }
 
-    const query = client.query('SELECT user_id, username, firstname, lastname, hall, image, memberType, cm, phone_number, room_number FROM members WHERE active IS TRUE ORDER BY lastname ASC;');
+    const query = client.query('SELECT * FROM members WHERE active IS TRUE ORDER BY lastname ASC;');
     
     query.on('row', (row) => {
       results.push(row);
@@ -1310,7 +1310,7 @@ router.get('/api/v1/equipment', (req, res, next) => {
       return res.status(500).json({success: false, data: err});
     }
 
-    const query = client.query('SELECT equipmentid, equipmentname, equipmentdescription, rentaltimeindays, equipmentEmbed FROM equipment;');
+    const query = client.query('SELECT * FROM equipment;');
     query.on('row', (row) => {
       results.push(row);
     });
@@ -1379,6 +1379,156 @@ router.put('/api/v1/infoText/:id', (req, res, next) => {
     query.on('end', () => {  
       done();  
       return res.json(results);  
+    });
+  });
+});
+
+/*------------------------ Gallery Endpoints -----------------------------*/
+
+router.get('/api/v1/photoGalleryAll', (req, res, next) => {
+  const results = [];
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: err});
+    }
+
+    const query = client.query('SELECT * FROM photoGallery');
+    
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
+router.get('/api/v1/photoGalleryRestricted', (req, res, next) => {
+  const results = [];
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: err});
+    }
+
+    const query = client.query('SELECT * FROM photoGallery WHERE approved = \'approved\';');
+    
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
+router.put('/api/v1/photoGallery/:id', (req, res, next) => {
+  const results = [];
+
+  const id = req.params.id;
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
+    }
+
+    var firstQuery = createUpdateQuery(id, 'photo_gallery_id', req.body, 'photoGallery');
+
+    var colValues = [];
+    Object.keys(req.body).filter(function (key) {
+      colValues.push(req.body[key]);
+    });
+
+    client.query(firstQuery, colValues);
+
+    const query = client.query('SELECT * FROM photoGallery WHERE photo_gallery_id = $1', [id]);
+
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
+router.post('/api/v1/photoGallery', (req, res, next) => {
+  const results= [];
+
+  const data = {path_to_photo: req.body.path_to_photo, approved: req.body.approved};
+
+  if(data.path_to_photo == null || data.approved == null) {
+    return res.status(400).json({success: false, data: "This is not a properly formed gallery photo object."});
+  }
+
+  pg.connect(connectionString, (err, client, done) => {
+
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: err});
+    }
+
+    var firstQuery = createNewEntryQuery(req.body, 'photogallery');
+
+    var colValues = [];
+    Object.keys(req.body).filter(function (key) {
+      colValues.push(req.body[key]);
+    });
+
+    client.query(firstQuery, colValues);
+
+    const query = client.query('SELECT * FROM photoGallery WHERE path_to_photo = $1', [data.path_to_photo]);
+
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
+router.delete('/api/v1/photoGallery/:id', (req, res, next) => {
+  const results = [];
+
+  const id = req.params.id;
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
+    }
+
+    var firstQuery = 'DELETE FROM photoGallery WHERE photo_gallery_id = $1;'
+
+    client.query(firstQuery, [id]);
+
+    const query = client.query('SELECT * FROM photoGallery WHERE photo_gallery_id = $1', [id]);
+
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
     });
   });
 });
