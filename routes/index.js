@@ -118,7 +118,7 @@ router.put('/api/v1/events/:id', (req, res, next) => {
   pg.connect(connectionString, (err, client, done) => {
     if(err) {
       done();
-      console.log(err);
+      //console.log(err);
       return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
     }
 
