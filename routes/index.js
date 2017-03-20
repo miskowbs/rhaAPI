@@ -306,9 +306,7 @@ router.put('/api/v1/member/:id', (req, res, next) => {
       return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
     }
 
-    var firstQuery = createUpdateQuery(id, 'user_id', req.body, 'members'); 
-    console.log(firstQuery);
-    console.log(req.body);
+    var firstQuery = createUpdateQuery(id, 'user_id', req.body, 'members');
     var colValues = [];
     Object.keys(req.body).filter(function (key) {
       colValues.push(req.body[key]);
@@ -653,7 +651,6 @@ router.put('/api/v1/addition', (req, res, next) => {
       return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
     }
     var reqJson = req.body;
-    console.log(reqJson);
 
     const query = client.query('SELECT * FROM add_additions($1)', [reqJson.addition]);
 
@@ -821,8 +818,6 @@ router.delete('/api/v1/payment/:id', (req, res, next) => {
 router.post('/api/v1/proposal', urlencodedParser, function(req, res, next) {
   const results= [];
 
-  console.log(req.body);
-
   pg.connect(connectionString, (err, client, done) => {
 
     if(err) {
@@ -833,15 +828,12 @@ router.post('/api/v1/proposal', urlencodedParser, function(req, res, next) {
 
 
     var reqJson = req.body;
-    console.log(reqJson);
     var firstQuery = createNewEntryQuery(reqJson, 'proposals');
 
     var colValues = [];
     Object.keys(reqJson).filter(function (key) {
       colValues.push(reqJson[key]);
     });
-
-    console.log(firstQuery);
 
     client.query(firstQuery, colValues);
 
@@ -947,7 +939,6 @@ router.put('/api/v1/attendance/:quarter', urlencodedParser, (req, res, next) => 
           //have a better check here in case the usernames are empty
           if(e.username == sortedUsernames[0]) {
             present = 1;
-            console.log(e.username + ' was present.');
             if(sortedUsernames.length == 1) {
               sortedUsernames = [];
             } else {
