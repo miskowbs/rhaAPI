@@ -10,6 +10,9 @@ database:
 dependencies:
     pre:
         - npm install
+    postgres:
+        version:
+            9.5.5
         
 test:
     override:
