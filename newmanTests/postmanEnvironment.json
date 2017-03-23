@@ -12,7 +12,7 @@
       "enabled": true,
       "key": "api",
       "type": "text",
-      "value": "http://rha-website-1.csse.rose-hulman.edu:3000/api/v1"
+      "value": "127.0.0.1:3000/api/v1"
     },
     {
       "enabled": true,

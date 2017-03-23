@@ -1,6 +1,12 @@
 machine:
-    services:
-        - newman
+        
+    postgres:
+        version:
+            9.5.5
+     
+dependencies:
+    pre:
+        - npm install     
         
 test:
     override:
