@@ -1,12 +1,15 @@
 machine:
         
-    postgres:
-        version:
-            9.5.5
-     
+    environment:
+        DATABASE_URL: postgres://postgres@127.0.0.1:5433/rha
+             
 dependencies:
     pre:
-        - npm install     
+        - npm install
+    tags:
+        - linux
+        - node
+        - postgres
         
 test:
     override:
