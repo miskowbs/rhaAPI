@@ -6,13 +6,9 @@ machine:
 dependencies:
     pre:
         - npm install
-    tags:
-        - linux
-        - node
-        - postgres
         
 test:
     override:
-        - newman run ./newmanTests/committees.json -e ./newmanTests/postmanEnvironment.json
+        - npm test
         
         
