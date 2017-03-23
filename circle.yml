@@ -9,6 +9,7 @@ dependencies:
         
 test:
     override:
+        - npm bin
         - ./node_modules/.bin/newman --version
         
         
