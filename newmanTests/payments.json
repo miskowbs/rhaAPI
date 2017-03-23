@@ -1,0 +1,207 @@
+{
+	"variables": [],
+	"info": {
+		"name": "RHAwebsite payments",
+		"_postman_id": "eb1846d2-b143-849d-7feb-620505d67687",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "01 - payments init",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"var jsonData = JSON.parse(responseBody);",
+							"var numb_payments = jsonData.length",
+							"postman.setEnvironmentVariable(\"numb_payments\", numb_payments);",
+							"",
+							"tests[\"Response time is less than 200ms\"] = responseTime < 200;",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "{{api}}/payments",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "02 - direct get non-existent",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 404\"] = responseCode.code === 404;",
+							"",
+							"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "{{api}}/payment/{{expenses_id}}",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "03 - post bad payment fails",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 400\"] = responseCode.code === 400;",
+							"",
+							"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "{{api}}/payment",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"anweoidhaoiwd\": \"aoiwdnh\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "04 - verify bad post doesn't post",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"var jsonData = JSON.parse(responseBody);",
+							"var numb_payments = jsonData.length + \"\";",
+							"var expected = postman.getEnvironmentVariable(\"numb_payments\");",
+							"",
+							"tests[\"no new payments added\"] = numb_payments === expected;",
+							"",
+							"tests[\"Response time is less than 200ms\"] = responseTime < 200;",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "{{api}}/payments",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "05 - post new payment",
+			"request": {
+				"url": "{{api}}/payment",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"proposal_id\": 18,\n    \"cm\": 2863,\n    \"receiver\": \"Morgan N. Cook\",\n    \"amountused\": 250,\n    \"description\": \"test event description.\",\n    \"accountcode\": 3,\n    \"datereceived\": \"2016-11-09T05:00:00.000Z\",\n    \"dateprocessed\": \"2017-01-05T05:00:00.000Z\"\n  }"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "06 - verify post new payment",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"var jsonData = JSON.parse(responseBody);",
+							"var numb_payments = jsonData.length;",
+							"var expected = parseInt(postman.getEnvironmentVariable(\"numb_payments\"))+1;",
+							"",
+							"tests[\"one payment added\"] = numb_payments === expected;",
+							"",
+							"var payment = {};",
+							"var targetId = postman.getEnvironmentVariable(\"expenses_id\");",
+							"",
+							"jsonData.forEach(function(pay) {",
+							"    if (pay.expenses_id+\"\" === targetId) {",
+							"        payment = pay;",
+							"    }",
+							"});",
+							"",
+							"tests[\"proposal_id field is correct\"] = \"\"+payment.proposal_id === \"18\";",
+							"tests[\"cm field is correct\"] = \"\"+payment.cm === \"2863\";",
+							"tests[\"receiver field is correct\"] = \"\"+payment.receiver === \"Morgan N. Cook\";",
+							"tests[\"amountused field is correct\"] = \"\"+payment.amountused === \"250\"",
+							"tests[\"description field is correct\"] = \"\"+payment.description === \"test event description.\"",
+							"tests[\"accountcode field is correct\"] = \"\"+payment.accountcode === \"3\"",
+							"tests[\"datereceived field is correct\"] = \"\"+payment.datereceived === \"2016-11-09T05:00:00.000Z\"",
+							"tests[\"dateprocessed field is correct\"] = \"\"+payment.dateprocessed === \"2017-01-05T05:00:00.000Z\"",
+							"/*",
+							" \"proposal_id\": 18,",
+							"    \"cm\": 2863,",
+							"    \"receiver\": \"Morgan N. Cook\",",
+							"    \"amountused\": 250,",
+							"    \"description\": \"test event description.\",",
+							"    \"accountcode\": 3,",
+							"    \"datereceived\": \"2016-11-09T05:00:00.000Z\",",
+							"    \"dateprocessed\": \"2017-01-05T05:00:00.000Z\"",
+							"*/",
+							"",
+							"tests[\"Response time is less than 200ms\"] = responseTime < 200;",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "{{api}}/payments",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}

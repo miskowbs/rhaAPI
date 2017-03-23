@@ -1,0 +1,9 @@
+machine:
+    services:
+        - newman
+        
+test:
+    override:
+        - newman run ./newmanTests/committees.json -e ./newmanTests/postmanEnvironment.json
+        
+        

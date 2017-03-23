@@ -1,0 +1,306 @@
+{
+	"variables": [],
+	"info": {
+		"name": "RHAwebsiteMemberRESTful",
+		"_postman_id": "d77d0dd8-8cd0-8333-7730-412ebdf6b291",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "01 - GET: nothing",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 404\"] = responseCode.code === 200;",
+							"",
+							"",
+							"var jsonData = JSON.parse(responseBody);",
+							"var hasId = false;",
+							"jsonData.forEach(function(obj) {",
+							"    if (obj.user_id == postman.getEnvironmentVariable(\"user_id\")) {",
+							"        hasId = true;",
+							"    }",
+							"});",
+							"tests[\"test member doesn't exist\"] = !hasId;",
+							"",
+							"",
+							"tests[\"Response time is ok\"] = responseTime < ",
+							"        parseInt(postman.getEnvironmentVariable(\"desiredResponseTime\"));",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "{{api}}/members",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": "should try to get a test user that has not been created yet."
+			},
+			"response": []
+		},
+		{
+			"name": "02 - POST: new test member",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"var jsonData = JSON.parse(responseBody)[0];",
+							"postman.setEnvironmentVariable(\"user_id\", jsonData.user_id);",
+							"postman.setEnvironmentVariable(\"username\", jsonData.username);",
+							"postman.setEnvironmentVariable(\"firstname\", jsonData.firstname);",
+							"postman.setEnvironmentVariable(\"lastname\", jsonData.lastname);",
+							"postman.setEnvironmentVariable(\"hall\", jsonData.hall);",
+							"postman.setEnvironmentVariable(\"image\", jsonData.image);",
+							"postman.setEnvironmentVariable(\"membertype\", jsonData.membertype);",
+							"postman.setEnvironmentVariable(\"active\", jsonData.active);",
+							"postman.setEnvironmentVariable(\"trip_eligible\", jsonData.trip_eligible);",
+							"postman.setEnvironmentVariable(\"meet_attend\", jsonData.meet_attend);",
+							"postman.setEnvironmentVariable(\"cm\", jsonData.cm);",
+							"postman.setEnvironmentVariable(\"phone_number\", jsonData.phone_number);",
+							"postman.setEnvironmentVariable(\"room_number\", jsonData.room_number);",
+							"",
+							"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "{{api}}/officer",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\": \"_test_\",\n\t\"firstname\": \"Testy\",\n\t\"lastname\": \"McTesterson\",\n\t\"hall\": \"Apartments E 1\",\n\t\"image\": \"null\",\n\t\"CM\": \"1234\",\n\t\"phoneNumber\": \"1234567890\",\n\t\"roomNumber\": \"1111\",\n    \"meet_attend\": []\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "03 - verify post",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"",
+							"var jsonData = JSON.parse(responseBody);",
+							"var hasId = false;",
+							"jsonData.forEach(function(obj) {",
+							"    if (obj.user_id == postman.getEnvironmentVariable(\"user_id\")) {",
+							"        hasId = true;",
+							"        for (var f in obj) {",
+							"            var expected = postman.getEnvironmentVariable(f);",
+							"            var testMsg = \"correct \" + f + \" value (\" + obj[f] + \", \" + expected + \")\";",
+							"            tests[testMsg] = \"\"+obj[f] === expected;",
+							"        }",
+							"    }",
+							"});",
+							"tests[\"new test member exist\"] = hasId;",
+							"",
+							"tests[\"Response time is ok\"] = responseTime < ",
+							"        parseInt(postman.getEnvironmentVariable(\"desiredResponseTime\"));",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "{{api}}/members",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "04 - edit test member",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"var jsonData = JSON.parse(responseBody)[0];",
+							"postman.setEnvironmentVariable(\"user_id\", jsonData.user_id);",
+							"postman.setEnvironmentVariable(\"username\", jsonData.username);",
+							"postman.setEnvironmentVariable(\"firstname\", jsonData.firstname);",
+							"postman.setEnvironmentVariable(\"lastname\", jsonData.lastname);",
+							"postman.setEnvironmentVariable(\"hall\", jsonData.hall);",
+							"postman.setEnvironmentVariable(\"image\", jsonData.image);",
+							"postman.setEnvironmentVariable(\"membertype\", jsonData.membertype);",
+							"postman.setEnvironmentVariable(\"active\", jsonData.active);",
+							"postman.setEnvironmentVariable(\"trip_eligible\", jsonData.trip_eligible);",
+							"postman.setEnvironmentVariable(\"meet_attend\", jsonData.meet_attend);",
+							"postman.setEnvironmentVariable(\"cm\", jsonData.cm);",
+							"postman.setEnvironmentVariable(\"phone_number\", jsonData.phone_number);",
+							"postman.setEnvironmentVariable(\"room_number\", jsonData.room_number);",
+							"postman.setEnvironmentVariable(\"meet_attend\", JSON.stringify(jsonData.meet_attend));",
+							"",
+							"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "{{api}}/member/{{user_id}}",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"firstname\": \"Not Test\",\n    \"lastname\": \"Different Name\",\n    \"hall\": \"Apartments W 2\",\n    \"image\": \"not null\",\n    \"membertype\": \"some member\",\n    \"cm\": \"9999\",\n    \"phone_number\": \"0987654321\",\n    \"room_number\": \"1111\",\n    \"meet_attend\": {\n      \"Q1\": [\n        0\n      ],\n      \"Q2\": [\n        1\n      ],\n      \"Q3\": []\n    }\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "05 - verify edit (put)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"var jsonData = JSON.parse(responseBody);",
+							"var hasId = false;",
+							"jsonData.forEach(function(obj) {",
+							"    if (obj.user_id == postman.getEnvironmentVariable(\"user_id\")) {",
+							"        hasId = true;",
+							"        for (var f in obj) {",
+							"            var expected = postman.getEnvironmentVariable(f);",
+							"            var testMsg = \"correct \" + f + \" value (\" + obj[f] + \", \" + expected + \")\";",
+							"            tests[testMsg] = \"\"+obj[f] === expected;",
+							"        }",
+							"    }",
+							"});",
+							"tests[\"edited test member exist\"] = hasId;",
+							"",
+							"tests[\"Response time is ok\"] = responseTime < ",
+							"        parseInt(postman.getEnvironmentVariable(\"desiredResponseTime\"));",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "{{api}}/members",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "06 - clean up new test member",
+			"request": {
+				"url": "{{api}}/member/{{user_id}}",
+				"method": "DELETE",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "07 - count active members",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"",
+							"var jsonData = JSON.parse(responseBody);",
+							"var numActiveMembers = 0;",
+							"jsonData.forEach(function(obj) {",
+							"    if (obj.active) {",
+							"        numActiveMembers += 1;",
+							"    }",
+							"});",
+							"postman.setEnvironmentVariable(\"numActiveMembers\", numActiveMembers);"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "{{api}}/members",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "08 - verify /activeMembers",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"tests[\"one is true\"] = 1",
+							"",
+							"var jsonData = JSON.parse(responseBody);",
+							"var numActiveMembers = 0;",
+							"var allItemsActive = true;",
+							"jsonData.forEach(function(obj) {",
+							"    numActiveMembers += 1;",
+							"    allItemsActive &= obj.active;",
+							"});",
+							"",
+							"var expectedActive = postman.getEnvironmentVariable(\"numActiveMembers\");",
+							"var activeTestMsg = \"correct number active (\" + numActiveMembers + \", \" + expectedActive + \")\"",
+							"tests[activeTestMsg] = (numActiveMembers) === expectedActive",
+							"",
+							"tests[\"all members active\"] = allItemsActive;",
+							"",
+							"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "{{api}}/activeMembers",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}

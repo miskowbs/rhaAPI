@@ -1,0 +1,216 @@
+{
+	"variables": [],
+	"info": {
+		"name": "RHAwebsiteEventsIsRESTfull",
+		"_postman_id": "ecd40d1c-a435-e0ba-f531-8cddeadbba2f",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "01 - GET nothing (events)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 404\"] = responseCode.code === 404;",
+							"",
+							"",
+							"tests[\"Response time is less than 200ms\"] = responseTime < 200;",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "{{api}}/events/2147483647",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": "this test should request an event which does not exist "
+			},
+			"response": []
+		},
+		{
+			"name": "02 - POST initial",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"var jsonData = JSON.parse(responseBody);",
+							"var firstEntry = jsonData[0];",
+							"",
+							"postman.setGlobalVariable(\"proposal_id\", firstEntry.proposal_id);",
+							"tests[\"correctly set global\"] = postman.getGlobalVariable(\"proposal_id\") == firstEntry.proposal_id;",
+							"",
+							"postman.setEnvironmentVariable(\"proposal_id\", firstEntry.proposal_id) + \"\";",
+							"postman.setEnvironmentVariable(\"proposer\", firstEntry.proposer) + \"\";",
+							"postman.setEnvironmentVariable(\"proposal_name\", firstEntry.proposal_name) + \"\";",
+							"postman.setEnvironmentVariable(\"week_proposed\", firstEntry.week_proposed) + \"\";",
+							"postman.setEnvironmentVariable(\"quarter_proposed\", firstEntry.quarter_proposed) + \"\";",
+							"postman.setEnvironmentVariable(\"money_requested\", firstEntry.money_requested) + \"\";",
+							"postman.setEnvironmentVariable(\"approved\", firstEntry.approved) + \"\";",
+							"postman.setEnvironmentVariable(\"money_allocated\", firstEntry.money_allocated) + \"\";",
+							"postman.setEnvironmentVariable(\"paid\", firstEntry.paid) + \"\";",
+							"postman.setEnvironmentVariable(\"proposed_date\", firstEntry.proposed_date) + \"\";",
+							"postman.setEnvironmentVariable(\"event_date\", firstEntry.event_date) + \"\";",
+							"postman.setEnvironmentVariable(\"event_signup_open\", firstEntry.event_signup_open) + \"\";",
+							"postman.setEnvironmentVariable(\"event_signup_close\", firstEntry.event_signup_close) + \"\";",
+							"postman.setEnvironmentVariable(\"cost_to_attendee\", firstEntry.cost_to_attendee) + \"\";",
+							"postman.setEnvironmentVariable(\"image_path\", firstEntry.image_path) + \"\";",
+							"postman.setEnvironmentVariable(\"description\", firstEntry.description) + \"\";",
+							"postman.setEnvironmentVariable(\"attendees\", firstEntry.attendees) + \"\";",
+							"",
+							"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "{{api}}/proposal",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"proposal_name\": \"TEST EVENT\",\n\t\"cost_to_attendee\": 0,\n\t\"event_date\": \"2017-01-02T05:00:00.000Z\",\n\t\"event_signup_open\": \"2017-02-02T05:00:00.000Z\",\n\t\"event_signup_close\": \"2017-03-02T05:00:00.000Z\",\n\t\"proposer\": \"bonattt\",\n\t\"proposed_date\": \"2016-01-02T05:00:00.000Z\",\n\t\"week_proposed\": 2,\n\t\"quarter_proposed\": 1,\n\t\"money_requested\": 3,\n\t\"paid\": false,\n\t\"money_allocated\": 4,\n\t\"image_path\": \"image_path\",\n\t\"approved\": true,\n\t\"description\": \"TEST DESCRIPTION\"\n}"
+				},
+				"description": "this should put a event entry where there was not one before."
+			},
+			"response": []
+		},
+		{
+			"name": "03 - GET verify 02",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"var jsonData = JSON.parse(responseBody);",
+							"var firstEntry = jsonData[0];",
+							"",
+							"for (var field in firstEntry) {",
+							"    tests[field + \": \" + firstEntry[field] + \", \" + postman.getEnvironmentVariable(field)] =",
+							"        (firstEntry[field] + \"\") === postman.getEnvironmentVariable(field);",
+							"    ",
+							"}",
+							"",
+							"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "{{api}}/events/{{proposal_id}}",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": "this request should verify a new event was created with the put request."
+			},
+			"response": []
+		},
+		{
+			"name": "04 - PUT edit an event",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"",
+							"var jsonData = JSON.parse(responseBody)[0];",
+							"",
+							"for (var field in jsonData) {",
+							"    tests[field + \" was set to \" + jsonData[field]] = true;",
+							"    postman.setEnvironmentVariable(field, jsonData[field]) + \"\";",
+							"}",
+							"",
+							"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "{{api}}/events/{{proposal_id}}",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"description\": \"TEST DESCRIPTION - EDITED\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "05 - DELETE event",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "{{api}}/event/{{proposal_id}}",
+				"method": "DELETE",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "06 GET - verify delete",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 404;",
+							"",
+							"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "{{api}}/events/{{proposal_id}}",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": "this request verifies the event was deleted"
+			},
+			"response": []
+		}
+	]
+}
