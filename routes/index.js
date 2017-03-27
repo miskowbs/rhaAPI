@@ -1298,6 +1298,76 @@ router.get('/api/v1/updateFloorMoney', (req, res, next) => {
   });
 });
 
+/* POST new equipment data */
+router.post('/api/v1/equipment', (req, res, next) => {
+  const results= [];
+
+  const data = {path_to_photo: req.body.path_to_photo, approved: req.body.approved};
+
+  if(data.path_to_photo == null || data.approved == null) {
+    return res.status(400).json({success: false, data: "This is not a properly formed gallery photo object."});
+  }
+
+  pg.connect(connectionString, (err, client, done) => {
+
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: err});
+    }
+
+    var firstQuery = createNewEntryQuery(req.body, 'equipment');
+
+    var colValues = [];
+    Object.keys(req.body).filter(function (key) {
+      colValues.push(req.body[key]);
+    });
+
+    client.query(firstQuery, colValues);
+
+    const query = client.query('SELECT * FROM equipment WHERE equipmentName = $1', [data.equipmentName]);
+
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
+/* DELETE given equipment data */
+router.delete('/api/v1/equipment/:id', (req, res, next) => {
+  const results = [];
+
+  const id = req.params.id;
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
+    }
+
+    var firstQuery = 'DELETE FROM equipment WHERE equipmentID = $1;'
+
+    client.query(firstQuery, [id]);
+
+    const query = client.query('SELECT * FROM equipment WHERE equipmentID = $1', [id]);
+
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
 /*---------------------------- Equipment Endpoints ------------------------------*/
 
 /* GET all equipment data */
