@@ -1302,11 +1302,7 @@ router.get('/api/v1/updateFloorMoney', (req, res, next) => {
 router.post('/api/v1/equipment', (req, res, next) => {
   const results= [];
 
-  const data = {path_to_photo: req.body.path_to_photo, approved: req.body.approved};
-
-  if(data.path_to_photo == null || data.approved == null) {
-    return res.status(400).json({success: false, data: "This is not a properly formed gallery photo object."});
-  }
+  const data = {equipmentName: req.body.equipmentName, equipmentEmbed: req.body.equipmentEmbed};
 
   pg.connect(connectionString, (err, client, done) => {
 
