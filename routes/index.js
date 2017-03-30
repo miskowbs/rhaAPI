@@ -20,7 +20,7 @@ router.get('/api/v1/events', (req, res, next) => {
       return res.status(500).json({success: false, data: err});
     }
 
-    const query = client.query('SELECT * FROM proposals WHERE approved = true AND event_date >= CURRENT_DATE ORDER BY event_date ASC;');
+    const query = client.query('SELECT * FROM proposals WHERE event_date >= CURRENT_DATE ORDER BY event_date ASC;');
     
     query.on('row', (row) => {
       results.push(row);
@@ -69,7 +69,7 @@ router.get('/api/v1/pastEvents', (req, res, next) => {
       return res.status(500).json({success: false, data: "You did something so bad you broke the server =("});
     }
 
-    const query = client.query('SELECT * FROM proposals WHERE approved = true AND event_date < CURRENT_DATE AND event_signup_open IS NOT NULL AND event_signup_close IS NOT NULL AND event_date IS NOT NULL ORDER BY event_date DESC;');
+    const query = client.query('SELECT * FROM proposals WHERE event_date < CURRENT_DATE AND event_signup_open IS NOT NULL AND event_signup_close IS NOT NULL AND event_date IS NOT NULL ORDER BY event_date DESC;');
     
     query.on('row', (row) => {
       results.push(row);
@@ -118,7 +118,7 @@ router.put('/api/v1/events/:id', (req, res, next) => {
   pg.connect(connectionString, (err, client, done) => {
     if(err) {
       done();
-      //console.log(err);
+      console.log(err);
       return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
     }
 
@@ -235,6 +235,7 @@ router.get('/api/v1/members', (req, res, next) => {
   });
 });
 
+/* PUT Member */
 router.put('/api/v1/members/:username', (req, res, next) => {
   const results = [];
   const username = req.params.username;
@@ -306,7 +307,7 @@ router.put('/api/v1/member/:id', (req, res, next) => {
       return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
     }
 
-    var firstQuery = createUpdateQuery(id, 'user_id', req.body, 'members');
+    var firstQuery = createUpdateQuery(id, 'user_id', req.body, 'members'); 
     var colValues = [];
     Object.keys(req.body).filter(function (key) {
       colValues.push(req.body[key]);
@@ -376,7 +377,7 @@ router.get('/api/v1/activeMembers', (req, res, next) => {
     const query = client.query('SELECT * FROM members WHERE active IS TRUE ORDER BY lastname ASC;');
     
     query.on('row', (row) => {
-      results.push(row);
+     results.push(row);
     });
 
     query.on('end', () => {
@@ -1187,7 +1188,7 @@ router.put('/api/v1/floorExpense/:id', (req, res, next) => {
   });
 });
 
-/* DELETE a payment (expense) */
+/* DELETE a payment (expense) */ /* START HERE TOMORROW */
 router.delete('/api/v1/floorExpense/:id', (req, res, next) => {
   const results = [];
 
@@ -1289,12 +1290,78 @@ router.get('/api/v1/updateFloorMoney', (req, res, next) => {
   });
 });
 
+/* POST new equipment data */
+router.post('/api/v1/equipment', (req, res, next) => {
+  const results= [];
+
+  const data = {equipmentName: req.body.equipmentName, equipmentEmbed: req.body.equipmentEmbed};
+
+  pg.connect(connectionString, (err, client, done) => {
+
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: err});
+    }
+
+    var firstQuery = createNewEntryQuery(req.body, 'equipment');
+
+    var colValues = [];
+    Object.keys(req.body).filter(function (key) {
+      colValues.push(req.body[key]);
+    });
+
+    client.query(firstQuery, colValues);
+
+    const query = client.query('SELECT * FROM equipment WHERE equipmentName = $1', [data.equipmentName]);
+
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
+/* DELETE given equipment data */
+router.delete('/api/v1/equipment/:id', (req, res, next) => {
+  const results = [];
+
+  const id = req.params.id;
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
+    }
+
+    var firstQuery = 'DELETE FROM equipment WHERE equipmentID = $1;'
+
+    client.query(firstQuery, [id]);
+
+    const query = client.query('SELECT * FROM equipment WHERE equipmentID = $1', [id]);
+
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
 /*---------------------------- Equipment Endpoints ------------------------------*/
 
 /* GET all equipment data */
 router.get('/api/v1/equipment', (req, res, next) => {
   const results = [];
-    pg.connect(connectionString, (err, client, done) => {
+   pg.connect(connectionString, (err, client, done) => {
     if(err) {
       done();
       console.log(err);
