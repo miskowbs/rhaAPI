@@ -69,7 +69,7 @@ router.get('/api/v1/pastEvents', (req, res, next) => {
       return res.status(500).json({success: false, data: "You did something so bad you broke the server =("});
     }
 
-    const query = client.query('SELECT * FROM proposals WHERE approved = true AND event_date < CURRENT_DATE AND event_signup_open IS NOT NULL AND event_signup_close IS NOT NULL AND event_date IS NOT NULL ORDER BY event_date DESC;');
+    const query = client.query('SELECT * FROM proposals WHERE event_date < CURRENT_DATE AND event_signup_open IS NOT NULL AND event_signup_close IS NOT NULL AND event_date IS NOT NULL ORDER BY event_date DESC;');
     
     query.on('row', (row) => {
       results.push(row);
@@ -235,6 +235,7 @@ router.get('/api/v1/members', (req, res, next) => {
   });
 });
 
+/* PUT Member */
 router.put('/api/v1/members/:username', (req, res, next) => {
   const results = [];
   const username = req.params.username;
@@ -1187,7 +1188,7 @@ router.put('/api/v1/floorExpense/:id', (req, res, next) => {
   });
 });
 
-/* DELETE a payment (expense) */
+/* DELETE a payment (expense) */ /* START HERE TOMORROW */
 router.delete('/api/v1/floorExpense/:id', (req, res, next) => {
   const results = [];
 
