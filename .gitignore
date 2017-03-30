@@ -43,4 +43,4 @@ pids
 *.seed
 *.pid.lock
 
-
+/node_modules
