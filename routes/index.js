@@ -1317,7 +1317,7 @@ router.get('/api/v1/purgeMembers', (req, res, next) => {
 
 
 /* Calls the postgres function backup_members_table() */
-router.get('/api/v1/backupMembersTable', (req, res, next) => {
+router.get('/api/v1/undoPurge', (req, res, next) => {
   const results = [];
 
   pg.connect(connectionString, (err, client, done) => {
@@ -1327,7 +1327,7 @@ router.get('/api/v1/backupMembersTable', (req, res, next) => {
       return res.status(500).json({success: false, data: err});
     }
 
-    const query = client.query('SELECT * FROM backup_members_table()');
+    const query = client.query('SELECT * FROM undoPurge()');
     
     query.on('row', (row) => {
       results.push(row);
