@@ -69,6 +69,7 @@ router.get('/api/v1/pastEvents', (req, res, next) => {
       return res.status(500).json({success: false, data: "You did something so bad you broke the server =("});
     }
 
+    var CURRENT_DATE = new Date();
     var currentYear = CURRENT_DATE.getYear();
     var currentMonth = CURRENT_DATE.getMonth();
 
