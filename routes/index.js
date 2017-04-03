@@ -81,8 +81,8 @@ router.get('/api/v1/pastEvents', (req, res, next) => {
       var necessaryYearMoreThanSix = currentYear;
     }
 
-    console.log("The necessary year less than six is:");
-    console.log(necessaryYearLessThanSix);
+    console.log("The current year is:");
+    console.log(currentYear);
 
     const query = client.query('SELECT * FROM proposals WHERE event_date < CURRENT_DATE AND event_signup_open IS NOT NULL AND event_signup_close IS NOT NULL AND event_date IS NOT NULL AND ((EXTRACT(MONTH FROM event_date) <= 6 AND EXTRACT(YEAR FROM event_date) = '  + necessaryYearLessThanSix + ') OR (EXTRACT(MONTH FROM event_date) > 6 AND EXTRACT(YEAR FROM event_date)) = ' + necessaryYearMoreThanSix + ') ORDER BY event_date DESC;');
 
