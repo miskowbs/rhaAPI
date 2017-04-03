@@ -1295,6 +1295,56 @@ router.get('/api/v1/updateFloorMoney', (req, res, next) => {
   });
 });
 
+
+/* Calls the postgres function purgeMembers() */
+router.get('/api/v1/purgeMembers', (req, res, next) => {
+  const results = [];
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: err});
+    }
+
+    const query = client.query('SELECT * FROM purgeMembers()');
+    
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
+
+/* Calls the postgres function backup_members_table() */
+router.get('/api/v1/undoPurge', (req, res, next) => {
+  const results = [];
+
+  pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: err});
+    }
+
+    const query = client.query('SELECT * FROM undoPurge()');
+    
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
 /* POST new equipment data */
 router.post('/api/v1/equipment', (req, res, next) => {
   const results= [];
