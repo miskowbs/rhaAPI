@@ -69,14 +69,18 @@ router.get('/api/v1/pastEvents', (req, res, next) => {
       return res.status(500).json({success: false, data: "You did something so bad you broke the server =("});
     }
 
-    console.log("HELLO THIS IS WHERE I AM");
-    if(CURRENT_DATE.getMonth() < 7){
-    consolg.log("YO I AM INSIDE THE IF STATEMENT");
-    const query = client.query('SELECT * FROM proposals WHERE event_date < CURRENT_DATE AND event_signup_open IS NOT NULL AND event_signup_close IS NOT NULL AND event_date IS NOT NULL AND ((EXTRACT(MONTH FROM event_date) <= 6 AND EXTRACT(YEAR FROM event_date) = EXTRACT(YEAR FROM CURRENT_DATE)) OR (EXTRACT(MONTH FROM event_date) > 6 AND EXTRACT(YEAR FROM event_date) = (EXTRACT(YEAR FROM CURRENT_DATE) - 1)) ORDER BY event_date DESC;');
+    var currentYear = CURRENT_DATE.getYear();
+    var currentMonth = CURRENT_DATE.getMonth();
+
+    if(currentMonth <= 6){
+      var necessaryYearLessThanSix = currentYear;
+      var necessaryYearMoreThanSix = currentYear - 1;
     } else{
-    console.log("YO I AM INSIDE THE ELSE STATEMENT");
-    const query = client.query('SELECT * FROM proposals WHERE event_date < CURRENT_DATE AND event_signup_open IS NOT NULL AND event_signup_close IS NOT NULL AND event_date IS NOT NULL AND ((EXTRACT(MONTH FROM event_date) <= 6 AND EXTRACT(YEAR FROM event_date) = (EXTRACT(YEAR FROM CURRENT_DATE) + 1)) OR (EXTRACT(MONTH FROM event_date) > 6 AND EXTRACT(YEAR FROM event_date) = EXTRACT(YEAR FROM CURRENT_DATE)) ORDER BY event_date DESC;');
+      var necessaryYearLessThanSix = currentYear + 1;
+      var necessaryYearMoreThanSix = currentYear;
     }
+
+    const query = client.query('SELECT * FROM proposals WHERE event_date < CURRENT_DATE AND event_signup_open IS NOT NULL AND event_signup_close IS NOT NULL AND event_date IS NOT NULL AND ((EXTRACT(MONTH FROM event_date) <= 6 AND EXTRACT(YEAR FROM event_date) = necessaryYearLessThanSix) OR (EXTRACT(MONTH FROM event_date) > 6 AND EXTRACT(YEAR FROM event_date) = necessaryYearMoreThanSix) ORDER BY event_date DESC;');
 
     
     query.on('row', (row) => {
