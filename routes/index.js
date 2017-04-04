@@ -87,7 +87,7 @@ router.get('/api/v1/pastEvents', (req, res, next) => {
 
     // var queryText = 'SELECT * FROM proposals WHERE event_date < CURRENT_DATE AND event_signup_open IS NOT NULL AND event_signup_close IS NOT NULL AND event_date IS NOT NULL AND ((EXTRACT(MONTH FROM event_date) <= 6 AND EXTRACT(YEAR FROM event_date) = '  + necessaryYearLessThanSix + ') OR (EXTRACT(MONTH FROM event_date) > 6 AND EXTRACT(YEAR FROM event_date)) = ' + necessaryYearMoreThanSix + ') ORDER BY event_date DESC;';
 
-    var queryText = 'SELECT * FROM proposals WHERE event_date < CURRENT_DATE AND event_signup_open IS NOT NULL AND event_signup_close IS NOT NULL AND event_date IS NOT NULL AND EXTRACT(MONTH FROM event_date) <= 6 AND EXTRACT(YEAR FROM event_date) = '  + necessaryYearLessThanSix + ' ORDER BY event_date DESC;';
+    var queryText = 'SELECT * FROM proposals WHERE event_date < CURRENT_DATE AND event_signup_open IS NOT NULL AND event_signup_close IS NOT NULL AND event_date IS NOT NULL AND (EXTRACT(MONTH FROM event_date) <= 6 AND EXTRACT(YEAR FROM event_date) = '  + necessaryYearLessThanSix + ') ORDER BY event_date DESC;';
 
     console.log(queryText);
 
