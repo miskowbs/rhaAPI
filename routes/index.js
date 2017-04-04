@@ -71,7 +71,7 @@ router.get('/api/v1/pastEvents', (req, res, next) => {
 
     var CURRENT_DATE = new Date();
     console.log(CURRENT_DATE);
-    var currentYear = CURRENT_DATE.getYear();
+    var currentYear = CURRENT_DATE.getFullYear();
     var currentMonth = CURRENT_DATE.getMonth();
 
     if(currentMonth <= 6){
