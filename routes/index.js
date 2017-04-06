@@ -69,7 +69,25 @@ router.get('/api/v1/pastEvents', (req, res, next) => {
       return res.status(500).json({ success: false, data: "You did something so bad you broke the server =(" });
     }
 
-    const query = client.query('SELECT * FROM proposals WHERE event_date < CURRENT_DATE AND event_signup_open IS NOT NULL AND event_signup_close IS NOT NULL AND event_date IS NOT NULL ORDER BY event_date DESC;');
+    var current_date = new Date();
+    var currentYear = current_date.getFullYear();
+    var currentMonth = current_date.getMonth();
+
+    /*Here, we are determining which calendar years match with the current school year
+      based on the current month. These two variables, necessaryYearLessThanSix and 
+      necessaryYearMoreThanSix represent the appropriate calendar year in order to 
+      include proposals spanning two calendar years but a single school year. */
+    if (currentMonth <= 6) {
+      var necessaryYearLessThanSix = currentYear;
+      var necessaryYearMoreThanSix = currentYear - 1;
+    } else {
+      var necessaryYearLessThanSix = currentYear + 1;
+      var necessaryYearMoreThanSix = currentYear;
+    }
+
+    var queryText = 'SELECT * FROM proposals WHERE event_date < CURRENT_DATE AND event_signup_open IS NOT NULL AND event_signup_close IS NOT NULL AND event_date IS NOT NULL AND (EXTRACT(MONTH FROM event_date) <= 6 AND EXTRACT(YEAR FROM event_date) = '  + necessaryYearLessThanSix + ') OR (EXTRACT(MONTH FROM event_date) > 6 AND EXTRACT(YEAR FROM event_date) = ' + necessaryYearMoreThanSix + ') ORDER BY event_date DESC;';
+
+    const query = client.query(queryText);
 
     query.on('row', (row) => {
       results.push(row);
@@ -1200,7 +1218,7 @@ router.put('/api/v1/floorExpense/:id', (req, res, next) => {
   });
 });
 
-/* DELETE a payment (expense) */ /* START HERE TOMORROW */
+/* DELETE a payment (expense) */
 router.delete('/api/v1/floorExpense/:id', (req, res, next) => {
   const results = [];
 
