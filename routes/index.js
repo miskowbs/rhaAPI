@@ -69,9 +69,9 @@ router.get('/api/v1/pastEvents', (req, res, next) => {
       return res.status(500).json({ success: false, data: "You did something so bad you broke the server =(" });
     }
 
-    var CURRENT_DATE = new Date();
-    var currentYear = CURRENT_DATE.getFullYear();
-    var currentMonth = CURRENT_DATE.getMonth();
+    var current_date = new Date();
+    var currentYear = current_date.getFullYear();
+    var currentMonth = current_date.getMonth();
 
     if (currentMonth <= 6) {
       var necessaryYearLessThanSix = currentYear;
@@ -92,6 +92,7 @@ router.get('/api/v1/pastEvents', (req, res, next) => {
 
     query.on('end', () => {
       done();
+      console.log(results);
       return res.json(results);
     });
   });
