@@ -73,6 +73,10 @@ router.get('/api/v1/pastEvents', (req, res, next) => {
     var currentYear = current_date.getFullYear();
     var currentMonth = current_date.getMonth();
 
+    /*Here, we are determining which calendar years match with the current school year
+      based on the current month. These two variables, necessaryYearLessThanSix and 
+      necessaryYearMoreThanSix represent the appropriate calendar year in order to 
+      include proposals spanning two calendar years but a single school year. */
     if (currentMonth <= 6) {
       var necessaryYearLessThanSix = currentYear;
       var necessaryYearMoreThanSix = currentYear - 1;
@@ -92,7 +96,6 @@ router.get('/api/v1/pastEvents', (req, res, next) => {
 
     query.on('end', () => {
       done();
-      console.log(results);
       return res.json(results);
     });
   });
