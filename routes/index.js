@@ -1,10 +1,10 @@
 var express = require('express');
 var router = express.Router();
-var pg = require('pg'); 
+var pg = require('pg');
 var path = require('path');
 var connectionString = process.env.DATABASE_URL || 'postgres://postgres:rhasite@rha-website-0.csse.rose-hulman.edu/rha'
 var bodyParser = require('body-parser');
-var urlencodedParser = bodyParser.urlencoded({ extended: false});
+var urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 /*---------------------------- Events Endpoints ------------------------------*/
 
@@ -14,14 +14,14 @@ router.get('/api/v1/events', (req, res, next) => {
   const results = [];
 
   pg.connect(connectionString, (err, client, done) => {
-    if(err) {
+    if (err) {
       done();
       console.log(err);
-      return res.status(500).json({success: false, data: err});
+      return res.status(500).json({ success: false, data: err });
     }
 
     const query = client.query('SELECT * FROM proposals WHERE event_date >= CURRENT_DATE ORDER BY event_date ASC;');
-    
+
     query.on('row', (row) => {
       results.push(row);
     });
@@ -38,14 +38,14 @@ router.get('/api/v1/allEvents', (req, res, next) => {
   const results = [];
 
   pg.connect(connectionString, (err, client, done) => {
-    if(err) {
+    if (err) {
       done();
       console.log(err);
-      return res.status(500).json({success: false, data: err});
+      return res.status(500).json({ success: false, data: err });
     }
 
     const query = client.query('SELECT * FROM proposals ORDER BY proposed_date DESC;');
-    
+
     query.on('row', (row) => {
       results.push(row);
     });
@@ -62,15 +62,34 @@ router.get('/api/v1/pastEvents', (req, res, next) => {
   const results = [];
 
   pg.connect(connectionString, (err, client, done) => {
-    if(err) {
+    if (err) {
       done();
       console;
       console.log(err);
-      return res.status(500).json({success: false, data: "You did something so bad you broke the server =("});
+      return res.status(500).json({ success: false, data: "You did something so bad you broke the server =(" });
     }
 
-    const query = client.query('SELECT * FROM proposals WHERE event_date < CURRENT_DATE AND event_signup_open IS NOT NULL AND event_signup_close IS NOT NULL AND event_date IS NOT NULL ORDER BY event_date DESC;');
-    
+    var current_date = new Date();
+    var currentYear = current_date.getFullYear();
+    var currentMonth = current_date.getMonth();
+
+    /*Here, we are determining which calendar years match with the current school year
+      based on the current month. These two variables, necessaryYearLessThanSix and 
+      necessaryYearMoreThanSix represent the appropriate calendar year in order to 
+      include proposals spanning two calendar years but a single school year. */
+    if (currentMonth <= 6) {
+      var necessaryYearLessThanSix = currentYear;
+      var necessaryYearMoreThanSix = currentYear - 1;
+    } else {
+      var necessaryYearLessThanSix = currentYear + 1;
+      var necessaryYearMoreThanSix = currentYear;
+    }
+
+    var queryText = 'SELECT * FROM proposals WHERE event_date < CURRENT_DATE AND event_signup_open IS NOT NULL AND event_signup_close IS NOT NULL AND event_date IS NOT NULL AND (EXTRACT(MONTH FROM event_date) <= 6 AND EXTRACT(YEAR FROM event_date) = '  + necessaryYearLessThanSix + ') OR (EXTRACT(MONTH FROM event_date) > 6 AND EXTRACT(YEAR FROM event_date) = ' + necessaryYearMoreThanSix + ') ORDER BY event_date DESC;';
+
+    const query = client.query(queryText);
+
+
     query.on('row', (row) => {
       results.push(row);
     });
@@ -89,15 +108,15 @@ router.get('/api/v1/events/:id', (req, res, next) => {
   const id = req.params.id;
 
   pg.connect(connectionString, (err, client, done) => {
-    if(err) {
+    if (err) {
       done();
       console;
       console.log(err);
-      return res.status(500).json({success: false, data: "You did something so bad you broke the server =("});
+      return res.status(500).json({ success: false, data: "You did something so bad you broke the server =(" });
     }
 
     const query = client.query('SELECT * FROM proposals WHERE proposal_id = $1;', [id]);
-    
+
     query.on('row', (row) => {
       results.push(row);
     });
@@ -116,10 +135,10 @@ router.put('/api/v1/events/:id', (req, res, next) => {
   const id = req.params.id;
 
   pg.connect(connectionString, (err, client, done) => {
-    if(err) {
+    if (err) {
       done();
       console.log(err);
-      return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
+      return res.status(500).json({ success: false, data: "You broke it so hard it stopped =(" });
     }
 
     var firstQuery = createUpdateQuery(id, 'proposal_id', req.body, 'proposals');
@@ -154,10 +173,10 @@ router.put('/api/v1/events/:event_id/attendees/:member_id', (req, res, next) => 
   const member_id = req.params.member_id;
 
   pg.connect(connectionString, (err, client, done) => {
-    if(err) {
+    if (err) {
       done();
       console.log(err);
-      return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
+      return res.status(500).json({ success: false, data: "You broke it so hard it stopped =(" });
     }
 
     var firstQuery = 'UPDATE proposals SET attendees = array_to_json(array(select * from jsonb_array_elements_text(attendees)) || (select username from members where username = $2)::text)::jsonb WHERE proposal_id = $1;'
@@ -185,10 +204,10 @@ router.delete('/api/v1/events/:event_id/attendees/:member_id', (req, res, next) 
   const member_id = req.params.member_id;
 
   pg.connect(connectionString, (err, client, done) => {
-    if(err) {
+    if (err) {
       done();
       console.log(err);
-      return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
+      return res.status(500).json({ success: false, data: "You broke it so hard it stopped =(" });
     }
 
     var firstQuery = 'UPDATE proposals SET attendees = array_to_json(array_remove(array(select * from jsonb_array_elements_text(attendees)), $2))::jsonb WHERE proposal_id = $1;'
@@ -215,11 +234,11 @@ router.get('/api/v1/members', (req, res, next) => {
   const results = [];
 
   pg.connect(connectionString, (err, client, done) => {
-    if(err) {
+    if (err) {
       done();
       console;
       console.log(err);
-      return res.status(500).json({success: false, data: "You did something so bad you broke the server =("});
+      return res.status(500).json({ success: false, data: "You did something so bad you broke the server =(" });
     }
 
     const query = client.query('SELECT * FROM members ORDER BY hall ASC, lastname ASC;');
@@ -240,13 +259,13 @@ router.put('/api/v1/members/:username', (req, res, next) => {
   const results = [];
   const username = req.params.username;
   pg.connect(connectionString, (err, client, done) => {
-    if(err) {
+    if (err) {
       done();
       console.log(err);
-      return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
+      return res.status(500).json({ success: false, data: "You broke it so hard it stopped =(" });
     }
-    
-    var firstQuery = createUpdateQuery('($'+ (Object.keys(req.body).length + 1) + ')', 'username', req.body, 'members'); 
+
+    var firstQuery = createUpdateQuery('($' + (Object.keys(req.body).length + 1) + ')', 'username', req.body, 'members');
 
     var colValues = [];
     Object.keys(req.body).filter(function (key) {
@@ -274,15 +293,15 @@ router.get('/api/v1/officers', (req, res, next) => {
   const results = [];
 
   pg.connect(connectionString, (err, client, done) => {
-    if(err) {
+    if (err) {
       done();
       console;
       console.log(err);
-      return res.status(500).json({success: false, data: "You did something so bad you broke the server =("});
+      return res.status(500).json({ success: false, data: "You did something so bad you broke the server =(" });
     }
 
     const query = client.query('SELECT * FROM members WHERE memberType IS NOT NULL ORDER BY lastname ASC;');
-    
+
     query.on('row', (row) => {
       results.push(row);
     });
@@ -301,13 +320,13 @@ router.put('/api/v1/member/:id', (req, res, next) => {
   const id = req.params.id;
 
   pg.connect(connectionString, (err, client, done) => {
-    if(err) {
+    if (err) {
       done();
       console.log(err);
-      return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
+      return res.status(500).json({ success: false, data: "You broke it so hard it stopped =(" });
     }
 
-    var firstQuery = createUpdateQuery(id, 'user_id', req.body, 'members'); 
+    var firstQuery = createUpdateQuery(id, 'user_id', req.body, 'members');
     var colValues = [];
     Object.keys(req.body).filter(function (key) {
       colValues.push(req.body[key]);
@@ -330,20 +349,20 @@ router.put('/api/v1/member/:id', (req, res, next) => {
 
 /* POST new officer (into Members) */
 router.post('/api/v1/officer', (req, res, next) => {
-  const results= [];
+  const results = [];
 
-  const data = {username: req.body.username, firstname: req.body.firstname, lastname: req.body.lastname, hall: req.body.hall, image: req.body.image, memberType: req.body.memberType, CM: req.body.CM, phoneNumber: req.body.phoneNumber, roomNumber: req.body.roomNumber};
+  const data = { username: req.body.username, firstname: req.body.firstname, lastname: req.body.lastname, hall: req.body.hall, image: req.body.image, memberType: req.body.memberType, CM: req.body.CM, phoneNumber: req.body.phoneNumber, roomNumber: req.body.roomNumber };
 
-  if(data.username==null || data.firstname == null || data.lastname == null || data.hall == null || data.image == null || data.CM == null || data.phoneNumber == null || data.roomNumber == null ) {
-    return res.status(400).json({success: false, data: "This is not a properly formed officer."});
+  if (data.username == null || data.firstname == null || data.lastname == null || data.hall == null || data.image == null || data.CM == null || data.phoneNumber == null || data.roomNumber == null) {
+    return res.status(400).json({ success: false, data: "This is not a properly formed officer." });
   }
 
   pg.connect(connectionString, (err, client, done) => {
 
-    if(err) {
+    if (err) {
       done();
       console.log(err);
-      return res.status(500).json({success: false, data: err});
+      return res.status(500).json({ success: false, data: err });
     }
 
     client.query('INSERT INTO members(username, firstname, lastname, hall, image, memberType,CM, phone_number, room_number) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9);',
@@ -367,17 +386,17 @@ router.get('/api/v1/activeMembers', (req, res, next) => {
   const results = [];
 
   pg.connect(connectionString, (err, client, done) => {
-    if(err) {
+    if (err) {
       done();
       console;
       console.log(err);
-      return res.status(500).json({success: false, data: "You did something so bad you broke the server =("});
+      return res.status(500).json({ success: false, data: "You did something so bad you broke the server =(" });
     }
 
     const query = client.query('SELECT * FROM members WHERE active IS TRUE ORDER BY lastname ASC;');
-    
+
     query.on('row', (row) => {
-     results.push(row);
+      results.push(row);
     });
 
     query.on('end', () => {
@@ -394,10 +413,10 @@ router.delete('/api/v1/event/:id', (req, res, next) => {
   const id = req.params.id;
 
   pg.connect(connectionString, (err, client, done) => {
-    if(err) {
+    if (err) {
       done();
       console.log(err);
-      return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
+      return res.status(500).json({ success: false, data: "You broke it so hard it stopped =(" });
     }
 
     const query = client.query('DELETE FROM proposals WHERE proposal_id = $1', [id]);
@@ -416,10 +435,10 @@ router.delete('/api/v1/member/:id', (req, res, next) => {
   const id = req.params.id;
 
   pg.connect(connectionString, (err, client, done) => {
-    if(err) {
+    if (err) {
       done();
       console.log(err);
-      return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
+      return res.status(500).json({ success: false, data: "You broke it so hard it stopped =(" });
     }
 
     const query = client.query('DELETE FROM members WHERE user_id = $1', [id]);
@@ -440,15 +459,15 @@ router.get('/api/v1/committees', (req, res, next) => {
   const results = [];
 
   pg.connect(connectionString, (err, client, done) => {
-    if(err) {
+    if (err) {
       done();
       console;
       console.log(err);
-      return res.status(500).json({success: false, data: "You did something so bad you broke the server =("});
+      return res.status(500).json({ success: false, data: "You did something so bad you broke the server =(" });
     }
 
     const query = client.query('SELECT * FROM committee ORDER BY committeeName ASC;');
-    
+
     query.on('row', (row) => {
       results.push(row);
     });
@@ -462,25 +481,25 @@ router.get('/api/v1/committees', (req, res, next) => {
 
 /* POST a new committee */
 router.post('/api/v1/committee', (req, res, next) => {
-  const results= [];
+  const results = [];
 
-  const data = {committeeName: req.body.committeeName, image: req.body.image, description: req.body.description};
+  const data = { committeeName: req.body.committeeName, image: req.body.image, description: req.body.description };
 
-  if(data.committeeName==null || data.description == null ) {
-    return res.status(400).json({success: false, data: "This is not properly formed committee."});
+  if (data.committeeName == null || data.description == null) {
+    return res.status(400).json({ success: false, data: "This is not properly formed committee." });
   }
 
   pg.connect(connectionString, (err, client, done) => {
 
-    if(err) {
+    if (err) {
       done();
       console.log(err);
-      return res.status(500).json({success: false, data: err});
+      return res.status(500).json({ success: false, data: err });
     }
 
     client.query('INSERT INTO committee(committeeName, image, description) VALUES ($1, $2, $3);',
       [data.committeeName, data.image, data.description]);
-    
+
     const query = client.query('SELECT * FROM committee WHERE committeeName = $1', [data.committeeName]);
 
     query.on('row', (row) => {
@@ -501,13 +520,13 @@ router.put('/api/v1/committee/:id', (req, res, next) => {
   const id = req.params.id;
 
   pg.connect(connectionString, (err, client, done) => {
-    if(err) {
+    if (err) {
       done();
       console.log(err);
-      return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
+      return res.status(500).json({ success: false, data: "You broke it so hard it stopped =(" });
     }
 
-    var firstQuery = createUpdateQuery(id, 'committeeid', req.body, 'committee'); 
+    var firstQuery = createUpdateQuery(id, 'committeeid', req.body, 'committee');
 
     var colValues = [];
     Object.keys(req.body).filter(function (key) {
@@ -536,10 +555,10 @@ router.delete('/api/v1/committee/:id', (req, res, next) => {
   const id = req.params.id;
 
   pg.connect(connectionString, (err, client, done) => {
-    if(err) {
+    if (err) {
       done();
       console.log(err);
-      return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
+      return res.status(500).json({ success: false, data: "You broke it so hard it stopped =(" });
     }
 
     const query = client.query('DELETE FROM committee WHERE committeeid = $1', [id]);
@@ -559,15 +578,15 @@ router.get('/api/v1/funds', (req, res, next) => {
   const results = [];
 
   pg.connect(connectionString, (err, client, done) => {
-    if(err) {
+    if (err) {
       done();
       console;
       console.log(err);
-      return res.status(500).json({success: false, data: "You did something so bad you broke the server =("});
+      return res.status(500).json({ success: false, data: "You did something so bad you broke the server =(" });
     }
 
     const query = client.query('SELECT * FROM funds ORDER BY funds_id ASC;');
-    
+
     query.on('row', (row) => {
       results.push(row);
     });
@@ -584,15 +603,15 @@ router.get('/api/v1/floorMoney', (req, res, next) => {
   const results = [];
 
   pg.connect(connectionString, (err, client, done) => {
-    if(err) {
+    if (err) {
       done();
       console;
       console.log(err);
-      return res.status(500).json({success: false, data: "You did something so bad you broke the server =("});
+      return res.status(500).json({ success: false, data: "You did something so bad you broke the server =(" });
     }
 
     const query = client.query('SELECT * FROM floorMoney ORDER BY hall_and_floor ASC;');
-    
+
     query.on('row', (row) => {
       results.push(row);
     });
@@ -611,13 +630,13 @@ router.put('/api/v1/fund/:id', (req, res, next) => {
   const id = req.params.id;
 
   pg.connect(connectionString, (err, client, done) => {
-    if(err) {
+    if (err) {
       done();
       console.log(err);
-      return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
+      return res.status(500).json({ success: false, data: "You broke it so hard it stopped =(" });
     }
 
-    var firstQuery = createUpdateQuery(id, 'funds_id', req.body, 'funds'); 
+    var firstQuery = createUpdateQuery(id, 'funds_id', req.body, 'funds');
 
     var colValues = [];
     Object.keys(req.body).filter(function (key) {
@@ -646,10 +665,10 @@ router.put('/api/v1/addition', (req, res, next) => {
   const id = req.params.id;
 
   pg.connect(connectionString, (err, client, done) => {
-    if(err) {
+    if (err) {
       done();
       console.log(err);
-      return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
+      return res.status(500).json({ success: false, data: "You broke it so hard it stopped =(" });
     }
     var reqJson = req.body;
 
@@ -672,15 +691,15 @@ router.get('/api/v1/payments', (req, res, next) => {
   const results = [];
 
   pg.connect(connectionString, (err, client, done) => {
-    if(err) {
+    if (err) {
       done();
       console;
       console.log(err);
-      return res.status(500).json({success: false, data: "You did something so bad you broke the server =("});
+      return res.status(500).json({ success: false, data: "You did something so bad you broke the server =(" });
     }
 
     const query = client.query('SELECT * FROM expenses ORDER BY expenses_id ASC;');
-    
+
     query.on('row', (row) => {
       results.push(row);
     });
@@ -699,15 +718,15 @@ router.get('/api/v1/payment/:id', (req, res, next) => {
   const id = req.params.id;
 
   pg.connect(connectionString, (err, client, done) => {
-    if(err) {
+    if (err) {
       done();
       console;
       console.log(err);
-      return res.status(500).json({success: false, data: "You did something so bad you broke the server =("});
+      return res.status(500).json({ success: false, data: "You did something so bad you broke the server =(" });
     }
 
     const query = client.query('SELECT * FROM expenses WHERE expenses_id = $1;', [id]);
-    
+
     query.on('row', (row) => {
       results.push(row);
     });
@@ -720,15 +739,15 @@ router.get('/api/v1/payment/:id', (req, res, next) => {
 });
 
 /* POST a new payment (expense) */
-router.post('/api/v1/payment', urlencodedParser, function(req, res, next) {
-  const results= [];
+router.post('/api/v1/payment', urlencodedParser, function (req, res, next) {
+  const results = [];
 
   pg.connect(connectionString, (err, client, done) => {
 
-    if(err) {
+    if (err) {
       done();
       console.log(err);
-      return res.status(500).json({success: false, data: err, body: req.body});
+      return res.status(500).json({ success: false, data: err, body: req.body });
     }
 
 
@@ -742,7 +761,7 @@ router.post('/api/v1/payment', urlencodedParser, function(req, res, next) {
 
     client.query(firstQuery, colValues);
 
-    const query = client.query('SELECT * FROM expenses WHERE proposal_id = $1 and CM = $2 and receiver = $3 and amountUsed = $4 and description = $5 and accountCode = $6', [reqJson.proposal_id, reqJson.CM, reqJson.receiver, reqJson.amountUsed, reqJson.description, reqJson.accountCode] )
+    const query = client.query('SELECT * FROM expenses WHERE proposal_id = $1 and CM = $2 and receiver = $3 and amountUsed = $4 and description = $5 and accountCode = $6', [reqJson.proposal_id, reqJson.CM, reqJson.receiver, reqJson.amountUsed, reqJson.description, reqJson.accountCode])
 
     query.on('row', (row) => {
       results.push(row);
@@ -762,13 +781,13 @@ router.put('/api/v1/payment/:id', (req, res, next) => {
   const id = req.params.id;
 
   pg.connect(connectionString, (err, client, done) => {
-    if(err) {
+    if (err) {
       done();
       console.log(err);
-      return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
+      return res.status(500).json({ success: false, data: "You broke it so hard it stopped =(" });
     }
 
-    var firstQuery = createUpdateQuery(id, 'expenses_id', req.body, 'expenses'); 
+    var firstQuery = createUpdateQuery(id, 'expenses_id', req.body, 'expenses');
 
     var colValues = [];
     Object.keys(req.body).filter(function (key) {
@@ -777,7 +796,7 @@ router.put('/api/v1/payment/:id', (req, res, next) => {
 
     client.query(firstQuery, colValues);
 
-    const query = client.query('SELECT * FROM expenses WHERE expenses_id = $1', [id]) ;
+    const query = client.query('SELECT * FROM expenses WHERE expenses_id = $1', [id]);
 
     query.on('row', (row) => {
       results.push(row);
@@ -797,10 +816,10 @@ router.delete('/api/v1/payment/:id', (req, res, next) => {
   const id = req.params.id;
 
   pg.connect(connectionString, (err, client, done) => {
-    if(err) {
+    if (err) {
       done();
       console.log(err);
-      return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
+      return res.status(500).json({ success: false, data: "You broke it so hard it stopped =(" });
     }
 
     const query = client.query('DELETE FROM expenses WHERE expenses_id = $1', [id]);
@@ -816,15 +835,15 @@ router.delete('/api/v1/payment/:id', (req, res, next) => {
 /*---------------------------- Proposals Endpoints ------------------------------*/
 
 /* POST a new proposal */
-router.post('/api/v1/proposal', urlencodedParser, function(req, res, next) {
-  const results= [];
+router.post('/api/v1/proposal', urlencodedParser, function (req, res, next) {
+  const results = [];
 
   pg.connect(connectionString, (err, client, done) => {
 
-    if(err) {
+    if (err) {
       done();
       console.log(err);
-      return res.status(500).json({success: false, data: err, body: req.body});
+      return res.status(500).json({ success: false, data: err, body: req.body });
     }
 
 
@@ -857,10 +876,10 @@ router.get('/api/v1/attendance/undo', (req, res, next) => {
   const results = "It worked!";
 
   pg.connect(connectionString, (err, client, done) => {
-    if(err) {
+    if (err) {
       done();
       console.log(err);
-      return res.status(500).json({success: false, data: err});
+      return res.status(500).json({ success: false, data: err });
     }
 
     var query1 = client.query("COPY Rentals TO '/tmp/rentalsBackup.csv' DELIMITER ',' CSV HEADER;");
@@ -894,10 +913,10 @@ router.put('/api/v1/attendance/:quarter', urlencodedParser, (req, res, next) => 
 
   var sortedUsernames = req.body.membersToUpdate;
   pg.connect(connectionString, (err, client, done) => {
-    if(err) {
+    if (err) {
       done();
       console.log(err);
-      return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
+      return res.status(500).json({ success: false, data: "You broke it so hard it stopped =(" });
     }
     var nameAndAttendance = [];
 
@@ -907,10 +926,10 @@ router.put('/api/v1/attendance/:quarter', urlencodedParser, (req, res, next) => 
     backup.on('end', () => {
       done(); //For catching errors if copy statement is wrong
     });
-    
+
     query.on('row', (row) => {
       results.push(row);
-      nameAndAttendance.push({username: row.username, meet_attend: row.meet_attend});
+      nameAndAttendance.push({ username: row.username, meet_attend: row.meet_attend });
     });
 
     query.on('end', () => {
@@ -920,7 +939,7 @@ router.put('/api/v1/attendance/:quarter', urlencodedParser, (req, res, next) => 
         var present = 0;
         var newAttendance = e.meet_attend;
         var updateQuarter = [];
-        switch(quarter) {
+        switch (quarter) {
           case 'Q1':
             updateQuarter = e.meet_attend.Q1;
             delete newAttendance.Q1;
@@ -933,14 +952,14 @@ router.put('/api/v1/attendance/:quarter', urlencodedParser, (req, res, next) => 
             updateQuarter = e.meet_attend.Q3;
             delete newAttendance.Q3;
             break;
-          default: 
-            return res.status(500).json({success: false, data: req.params.quarter + ' is not a valid quarter!'});
+          default:
+            return res.status(500).json({ success: false, data: req.params.quarter + ' is not a valid quarter!' });
         }
-        if(sortedUsernames.length > 0) {
+        if (sortedUsernames.length > 0) {
           //have a better check here in case the usernames are empty
-          if(e.username == sortedUsernames[0]) {
+          if (e.username == sortedUsernames[0]) {
             present = 1;
-            if(sortedUsernames.length == 1) {
+            if (sortedUsernames.length == 1) {
               sortedUsernames = [];
             } else {
               sortedUsernames.splice(0, 1);
@@ -948,7 +967,7 @@ router.put('/api/v1/attendance/:quarter', urlencodedParser, (req, res, next) => 
           }
         }
         updateQuarter.push(present);
-        switch(quarter) {
+        switch (quarter) {
           case 'Q1':
             newAttendance.Q1 = updateQuarter;
             break;
@@ -958,8 +977,8 @@ router.put('/api/v1/attendance/:quarter', urlencodedParser, (req, res, next) => 
           case 'Q3':
             newAttendance.Q3 = updateQuarter;
             break;
-          default: 
-            return res.status(500).json({success: false, data: req.params.quarter + ' is not a valid quarter!'});
+          default:
+            return res.status(500).json({ success: false, data: req.params.quarter + ' is not a valid quarter!' });
         }
         client.query(insertAttendance, [newAttendance, e.username]);
       });
@@ -968,7 +987,7 @@ router.put('/api/v1/attendance/:quarter', urlencodedParser, (req, res, next) => 
     var query2 = client.query("SELECT username, meet_attend from members ORDER BY username ASC;");
 
     query2.on('row', (row) => {
-      results.push({username: row.username, meet_attend: row.meet_attend});
+      results.push({ username: row.username, meet_attend: row.meet_attend });
     });
 
     query2.on('end', () => {
@@ -985,14 +1004,14 @@ router.post('/api/v1/awardsOnly', (req, res, next) => {
   const results = [];
 
   pg.connect(connectionString, (err, client, done) => {
-    if(err) {
+    if (err) {
       done();
       console.log(err);
-      return res.status(500).json({success: false, data: err});
+      return res.status(500).json({ success: false, data: err });
     }
 
     const query = client.query('SELECT * FROM sum_only_awards($1)', [req.body.floorName]);
-    
+
     query.on('row', (row) => {
       results.push(row);
     });
@@ -1009,14 +1028,14 @@ router.post('/api/v1/expensesOnly', (req, res, next) => {
   const results = [];
 
   pg.connect(connectionString, (err, client, done) => {
-    if(err) {
+    if (err) {
       done();
       console.log(err);
-      return res.status(500).json({success: false, data: err});
+      return res.status(500).json({ success: false, data: err });
     }
 
     const query = client.query('SELECT * FROM sum_only_expenses($1)', [req.body.floorName]);
-  
+
     query.on('row', (row) => {
       results.push(row);
     });
@@ -1035,15 +1054,15 @@ router.get('/api/v1/floorExpenses', (req, res, next) => {
   const results = [];
 
   pg.connect(connectionString, (err, client, done) => {
-    if(err) {
+    if (err) {
       done();
       console;
       console.log(err);
-      return res.status(500).json({success: false, data: "You did something so bad you broke the server =("});
+      return res.status(500).json({ success: false, data: "You did something so bad you broke the server =(" });
     }
 
     const query = client.query('SELECT * FROM floorExpenses ORDER BY floor_expense_id ASC;');
-    
+
     query.on('row', (row) => {
       results.push(row);
     });
@@ -1057,26 +1076,26 @@ router.get('/api/v1/floorExpenses', (req, res, next) => {
 
 /* POST a new floor expense */
 router.post('/api/v1/floorExpense', (req, res, next) => {
-  const results= [];
+  const results = [];
 
-  const data = {floor_id: req.body.floor_id, event_description: req.body.event_description, amount: req.body.amount, turned_in_date: req.body.turned_in_date, processed_date: req.body.processed_date};
+  const data = { floor_id: req.body.floor_id, event_description: req.body.event_description, amount: req.body.amount, turned_in_date: req.body.turned_in_date, processed_date: req.body.processed_date };
 
-  if(data.floor_id==null || data.event_description == null || data.amount == null || data.turned_in_date == null || data.processed_date == null) {
-    return res.status(400).json({success: false, data: "This is not a properly formed floor expense."});
+  if (data.floor_id == null || data.event_description == null || data.amount == null || data.turned_in_date == null || data.processed_date == null) {
+    return res.status(400).json({ success: false, data: "This is not a properly formed floor expense." });
   }
 
   pg.connect(connectionString, (err, client, done) => {
 
-    if(err) {
+    if (err) {
       done();
       console.log(err);
-      return res.status(500).json({success: false, data: err});
+      return res.status(500).json({ success: false, data: err });
     }
 
     client.query('INSERT INTO floorExpenses(floor_id, event_description, amount, turned_in_date, processed_date) VALUES ($1, $2, $3, $4, $5);',
       [data.floor_id, data.event_description, data.amount, data.turned_in_date, data.processed_date]);
 
-    const query = client.query('SELECT * FROM floorExpenses, floorMoney WHERE floorExpenses.event_description = $1 and floorExpenses.amount = $2 and floorExpenses.turned_in_date = $3 and floorExpenses.processed_date = $4 and floorMoney.floorMoney_id = floorExpenses.floor_id', [data.event_description, data.amount, data.turned_in_date, data.processed_date] )
+    const query = client.query('SELECT * FROM floorExpenses, floorMoney WHERE floorExpenses.event_description = $1 and floorExpenses.amount = $2 and floorExpenses.turned_in_date = $3 and floorExpenses.processed_date = $4 and floorMoney.floorMoney_id = floorExpenses.floor_id', [data.event_description, data.amount, data.turned_in_date, data.processed_date])
 
     query.on('row', (row) => {
       results.push(row);
@@ -1134,14 +1153,14 @@ router.get('/api/v1/floorExpense/:id', (req, res, next) => {
   const id = req.params.id;
 
   pg.connect(connectionString, (err, client, done) => {
-    if(err) {
+    if (err) {
       done();
       console.log(err);
-      return res.status(500).json({success: false, data: "You did something so bad you broke the server =("});
+      return res.status(500).json({ success: false, data: "You did something so bad you broke the server =(" });
     }
 
     const query = client.query('SELECT * FROM floorExpenses WHERE floor_expense_id = $1;', [id]);
-    
+
     query.on('row', (row) => {
       results.push(row);
     });
@@ -1160,13 +1179,13 @@ router.put('/api/v1/floorExpense/:id', (req, res, next) => {
   const id = req.params.id;
 
   pg.connect(connectionString, (err, client, done) => {
-    if(err) {
+    if (err) {
       done();
       console.log(err);
-      return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
+      return res.status(500).json({ success: false, data: "You broke it so hard it stopped =(" });
     }
 
-    var firstQuery = createUpdateQuery(id, 'floor_expense_id', req.body, 'floorExpenses'); 
+    var firstQuery = createUpdateQuery(id, 'floor_expense_id', req.body, 'floorExpenses');
 
     var colValues = [];
     Object.keys(req.body).filter(function (key) {
@@ -1175,7 +1194,7 @@ router.put('/api/v1/floorExpense/:id', (req, res, next) => {
 
     client.query(firstQuery, colValues);
 
-    const query = client.query('SELECT * FROM floorExpenses WHERE floor_expense_id = $1', [id]) ;
+    const query = client.query('SELECT * FROM floorExpenses WHERE floor_expense_id = $1', [id]);
 
     query.on('row', (row) => {
       results.push(row);
@@ -1188,17 +1207,17 @@ router.put('/api/v1/floorExpense/:id', (req, res, next) => {
   });
 });
 
-/* DELETE a payment (expense) */ /* START HERE TOMORROW */
+/* DELETE a payment (expense) */
 router.delete('/api/v1/floorExpense/:id', (req, res, next) => {
   const results = [];
 
   const id = req.params.id;
 
   pg.connect(connectionString, (err, client, done) => {
-    if(err) {
+    if (err) {
       done();
       console.log(err);
-      return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
+      return res.status(500).json({ success: false, data: "You broke it so hard it stopped =(" });
     }
 
     const query = client.query('DELETE FROM floorExpenses WHERE floor_expense_id = $1', [id]);
@@ -1222,14 +1241,14 @@ router.post('/api/v1/floorAttendance', (req, res, next) => {
   const results = [];
 
   pg.connect(connectionString, (err, client, done) => {
-    if(err) {
+    if (err) {
       done();
       console.log(err);
-      return res.status(500).json({success: false, data: err});
+      return res.status(500).json({ success: false, data: err });
     }
 
     const query = client.query('SELECT * FROM count_attendance_for_floor($1, $2)', [req.body.floorName, req.body.quarter]);
-    
+
     query.on('row', (row) => {
       results.push(row);
     });
@@ -1246,14 +1265,14 @@ router.post('/api/v1/getMoneyUsed', (req, res, next) => {
   const results = [];
 
   pg.connect(connectionString, (err, client, done) => {
-    if(err) {
+    if (err) {
       done();
       console.log(err);
-      return res.status(500).json({success: false, data: err});
+      return res.status(500).json({ success: false, data: err });
     }
 
     const query = client.query('SELECT * FROM get_money_used($1)', [req.body.proposal_id]);
-    
+
     query.on('row', (row) => {
       results.push(row);
     });
@@ -1271,14 +1290,14 @@ router.get('/api/v1/updateFloorMoney', (req, res, next) => {
   const results = [];
 
   pg.connect(connectionString, (err, client, done) => {
-    if(err) {
+    if (err) {
       done();
       console.log(err);
-      return res.status(500).json({success: false, data: err});
+      return res.status(500).json({ success: false, data: err });
     }
 
     const query = client.query('SELECT * FROM update_floor_money()');
-    
+
     query.on('row', (row) => {
       results.push(row);
     });
@@ -1296,14 +1315,14 @@ router.get('/api/v1/purgeMembers', (req, res, next) => {
   const results = [];
 
   pg.connect(connectionString, (err, client, done) => {
-    if(err) {
+    if (err) {
       done();
       console.log(err);
-      return res.status(500).json({success: false, data: err});
+      return res.status(500).json({ success: false, data: err });
     }
 
     const query = client.query('SELECT * FROM purgeMembers()');
-    
+
     query.on('row', (row) => {
       results.push(row);
     });
@@ -1321,14 +1340,14 @@ router.get('/api/v1/undoPurge', (req, res, next) => {
   const results = [];
 
   pg.connect(connectionString, (err, client, done) => {
-    if(err) {
+    if (err) {
       done();
       console.log(err);
-      return res.status(500).json({success: false, data: err});
+      return res.status(500).json({ success: false, data: err });
     }
 
     const query = client.query('SELECT * FROM undoPurge()');
-    
+
     query.on('row', (row) => {
       results.push(row);
     });
@@ -1342,16 +1361,16 @@ router.get('/api/v1/undoPurge', (req, res, next) => {
 
 /* POST new equipment data */
 router.post('/api/v1/equipment', (req, res, next) => {
-  const results= [];
+  const results = [];
 
-  const data = {equipmentName: req.body.equipmentName, equipmentEmbed: req.body.equipmentEmbed};
+  const data = { equipmentName: req.body.equipmentName, equipmentEmbed: req.body.equipmentEmbed };
 
   pg.connect(connectionString, (err, client, done) => {
 
-    if(err) {
+    if (err) {
       done();
       console.log(err);
-      return res.status(500).json({success: false, data: err});
+      return res.status(500).json({ success: false, data: err });
     }
 
     var firstQuery = createNewEntryQuery(req.body, 'equipment');
@@ -1383,10 +1402,10 @@ router.delete('/api/v1/equipment/:id', (req, res, next) => {
   const id = req.params.id;
 
   pg.connect(connectionString, (err, client, done) => {
-    if(err) {
+    if (err) {
       done();
       console.log(err);
-      return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
+      return res.status(500).json({ success: false, data: "You broke it so hard it stopped =(" });
     }
 
     var firstQuery = 'DELETE FROM equipment WHERE equipmentID = $1;'
@@ -1411,11 +1430,11 @@ router.delete('/api/v1/equipment/:id', (req, res, next) => {
 /* GET all equipment data */
 router.get('/api/v1/equipment', (req, res, next) => {
   const results = [];
-   pg.connect(connectionString, (err, client, done) => {
-    if(err) {
+  pg.connect(connectionString, (err, client, done) => {
+    if (err) {
       done();
       console.log(err);
-      return res.status(500).json({success: false, data: err});
+      return res.status(500).json({ success: false, data: err });
     }
 
     const query = client.query('SELECT * FROM equipment;');
@@ -1428,7 +1447,7 @@ router.get('/api/v1/equipment', (req, res, next) => {
       return res.json(results);
     });
   });
-}); 
+});
 
 
 /*---------------------------- InfoText Endpoints ------------------------------*/
@@ -1439,10 +1458,10 @@ router.get('/api/v1/infoText/:id', (req, res, next) => {
 
   const id = req.params.id;
   pg.connect(connectionString, (err, client, done) => {
-    if(err) {
+    if (err) {
       done();
       console.log(err);
-      return res.status(500).json({success: false, data: "You did something so bad you broke the server =("});
+      return res.status(500).json({ success: false, data: "You did something so bad you broke the server =(" });
     }
 
     const query = client.query('SELECT * FROM infoText WHERE info_text_id = $1;', [id]);
@@ -1455,7 +1474,7 @@ router.get('/api/v1/infoText/:id', (req, res, next) => {
       return res.json(results[0]);
     });
   });
-}); 
+});
 
 /* PUT modify an InfoText */
 router.put('/api/v1/infoText/:id', (req, res, next) => {
@@ -1464,29 +1483,29 @@ router.put('/api/v1/infoText/:id', (req, res, next) => {
   const id = req.params.id;
 
   pg.connect(connectionString, (err, client, done) => {
-    if(err) {
+    if (err) {
       done();
       console.log(err);
-      return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
+      return res.status(500).json({ success: false, data: "You broke it so hard it stopped =(" });
     }
-    var firstQuery = createUpdateQuery(id, 'info_text_id', req.body, 'infoText'); 
-    
+    var firstQuery = createUpdateQuery(id, 'info_text_id', req.body, 'infoText');
+
     var colValues = [];
     Object.keys(req.body).filter(function (key) {
       colValues.push(req.body[key]);
-    });  
+    });
 
     client.query(firstQuery, colValues);
 
-    const query = client.query('SELECT * FROM infoText WHERE info_text_id = $1', [id]) ;
-  
-    query.on('row', (row) => {  
-      results.push(row);  
-    });  
-  
-    query.on('end', () => {  
-      done();  
-      return res.json(results);  
+    const query = client.query('SELECT * FROM infoText WHERE info_text_id = $1', [id]);
+
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
     });
   });
 });
@@ -1497,14 +1516,14 @@ router.get('/api/v1/photoGalleryAll', (req, res, next) => {
   const results = [];
 
   pg.connect(connectionString, (err, client, done) => {
-    if(err) {
+    if (err) {
       done();
       console.log(err);
-      return res.status(500).json({success: false, data: err});
+      return res.status(500).json({ success: false, data: err });
     }
 
     const query = client.query('SELECT * FROM photoGallery');
-    
+
     query.on('row', (row) => {
       results.push(row);
     });
@@ -1520,14 +1539,14 @@ router.get('/api/v1/photoGalleryRestricted', (req, res, next) => {
   const results = [];
 
   pg.connect(connectionString, (err, client, done) => {
-    if(err) {
+    if (err) {
       done();
       console.log(err);
-      return res.status(500).json({success: false, data: err});
+      return res.status(500).json({ success: false, data: err });
     }
 
     const query = client.query('SELECT * FROM photoGallery WHERE approved = \'approved\';');
-    
+
     query.on('row', (row) => {
       results.push(row);
     });
@@ -1545,10 +1564,10 @@ router.put('/api/v1/photoGallery/:id', (req, res, next) => {
   const id = req.params.id;
 
   pg.connect(connectionString, (err, client, done) => {
-    if(err) {
+    if (err) {
       done();
       console.log(err);
-      return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
+      return res.status(500).json({ success: false, data: "You broke it so hard it stopped =(" });
     }
 
     var firstQuery = createUpdateQuery(id, 'photo_gallery_id', req.body, 'photoGallery');
@@ -1574,20 +1593,20 @@ router.put('/api/v1/photoGallery/:id', (req, res, next) => {
 });
 
 router.post('/api/v1/photoGallery', (req, res, next) => {
-  const results= [];
+  const results = [];
 
-  const data = {path_to_photo: req.body.path_to_photo, approved: req.body.approved};
+  const data = { path_to_photo: req.body.path_to_photo, approved: req.body.approved };
 
-  if(data.path_to_photo == null || data.approved == null) {
-    return res.status(400).json({success: false, data: "This is not a properly formed gallery photo object."});
+  if (data.path_to_photo == null || data.approved == null) {
+    return res.status(400).json({ success: false, data: "This is not a properly formed gallery photo object." });
   }
 
   pg.connect(connectionString, (err, client, done) => {
 
-    if(err) {
+    if (err) {
       done();
       console.log(err);
-      return res.status(500).json({success: false, data: err});
+      return res.status(500).json({ success: false, data: err });
     }
 
     var firstQuery = createNewEntryQuery(req.body, 'photogallery');
@@ -1618,10 +1637,10 @@ router.delete('/api/v1/photoGallery/:id', (req, res, next) => {
   const id = req.params.id;
 
   pg.connect(connectionString, (err, client, done) => {
-    if(err) {
+    if (err) {
       done();
       console.log(err);
-      return res.status(500).json({success: false, data: "You broke it so hard it stopped =("});
+      return res.status(500).json({ success: false, data: "You broke it so hard it stopped =(" });
     }
 
     var firstQuery = 'DELETE FROM photoGallery WHERE photo_gallery_id = $1;'
@@ -1644,7 +1663,7 @@ router.delete('/api/v1/photoGallery/:id', (req, res, next) => {
 /*---------------------------- Query Help ------------------------------*/
 
 /* Create an UpdateQuery */
-function createUpdateQuery (filterVal, filter, cols, table) {
+function createUpdateQuery(filterVal, filter, cols, table) {
   var query = ['UPDATE ' + table + ' SET'];
 
   var set = [];
@@ -1666,11 +1685,11 @@ function createNewEntryQuery(cols, table) {
   var variables = [];
   Object.keys(cols).forEach(function (key, i) {
     toUpdate.push(key);
-    variables.push('($' + (i+1) + ')');
+    variables.push('($' + (i + 1) + ')');
   });
 
   query.push(toUpdate.join(', ') + ') VALUES (' + variables.join(', ') + ')');
-  
+
   return query.join('');
 }
 module.exports = router;
