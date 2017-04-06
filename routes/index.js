@@ -89,7 +89,6 @@ router.get('/api/v1/pastEvents', (req, res, next) => {
 
     const query = client.query(queryText);
 
-
     query.on('row', (row) => {
       results.push(row);
     });
@@ -698,7 +697,19 @@ router.get('/api/v1/payments', (req, res, next) => {
       return res.status(500).json({ success: false, data: "You did something so bad you broke the server =(" });
     }
 
-    const query = client.query('SELECT * FROM expenses ORDER BY expenses_id ASC;');
+    var CURRENT_DATE = new Date();
+    var currentYear = CURRENT_DATE.getFullYear();
+    var currentMonth = CURRENT_DATE.getMonth();
+
+    if (currentMonth <= 6) {
+      var necessaryYearLessThanSix = currentYear;
+      var necessaryYearMoreThanSix = currentYear - 1;
+    } else {
+      var necessaryYearLessThanSix = currentYear + 1;
+      var necessaryYearMoreThanSix = currentYear;
+    }
+
+    const query = client.query('SELECT * FROM expenses WHERE (EXTRACT(MONTH FROM dateReceived) <= 6 AND EXTRACT(YEAR FROM dateReceived) = ' + necessaryYearLessThanSix + ') OR (EXTRACT(MONTH FROM dateReceived) > 6 AND EXTRACT(YEAR FROM dateReceived) = ' + necessaryYearMoreThanSix + ') ORDER BY expenses_id ASC;');
 
     query.on('row', (row) => {
       results.push(row);
