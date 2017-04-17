@@ -9,7 +9,7 @@ var urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 /*---------------------------- Events Endpoints ------------------------------*/
 
-https.get('*', (req, res) {
+https.get('*', (req, res) => {
   res.redirect(connectionString + req.url);
 }).listen(8080);
 
