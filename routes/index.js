@@ -1,5 +1,6 @@
 var express = require('express');
-var router = express.Router();
+var router = express.Router();  
+var https = express.createServer();
 var pg = require('pg');
 var path = require('path');
 var connectionString = process.env.DATABASE_URL || 'postgres://postgres:rhasite@rha-website-0.csse.rose-hulman.edu/rha'
@@ -7,6 +8,10 @@ var bodyParser = require('body-parser');
 var urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 /*---------------------------- Events Endpoints ------------------------------*/
+
+https.get('*', (req, res) {
+  res.redirect(connectionString + req.url);
+}).listen(8080);
 
 
 /* GET active events */
