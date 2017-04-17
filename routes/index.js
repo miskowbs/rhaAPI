@@ -1,4 +1,4 @@
-var express = require('express');
+var express = require('./lib/express');
 var router = express.Router();  
 var https = express.createServer();
 var pg = require('pg');
