@@ -3,7 +3,8 @@ var router = express.Router();
 // var https = express.createServer();
 var pg = require('pg');
 var path = require('path');
-var connectionString = process.env.DATABASE_URL || 'postgres://postgres:rhasite@rha-website-0.csse.rose-hulman.edu/rha'
+var connectionString = process.env.DATABASE_URL || 'postgres://postgres:rhasite@rha-website-0.csse.rose-hulman.edu/rha';
+var connectionStringRDS = "postgres://username:temppass@rha-db.ckx7yajhxnki.us-east-2.rds.amazonaws.com:3000/rha";
 var bodyParser = require('body-parser');
 var urlencodedParser = bodyParser.urlencoded({ extended: false });
 
@@ -462,7 +463,7 @@ router.delete('/api/v1/member/:id', (req, res, next) => {
 router.get('/api/v1/committees', (req, res, next) => {
   const results = [];
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionStringRDS, (err, client, done) => {
     if (err) {
       done();
       console;
@@ -487,7 +488,7 @@ router.get('/api/v1/committees', (req, res, next) => {
 router.get('/api/v1/committeesTest', (req, res, next) => {
   const results = [];
 
-  pg.connect("postgres://username:temppass@rha-db.ckx7yajhxnki.us-east-2.rds.amazonaws.com:3000/rha", (err, client, done) => {
+  pg.connect(connectionStringRDS, (err, client, done) => {
     if (err) {
       done();
       console;
