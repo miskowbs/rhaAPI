@@ -899,14 +899,8 @@ router.get('/api/v1/attendance/undo', (req, res, next) => {
       return res.status(500).json({ success: false, data: err });
     }
 
-    var query1 = client.query("COPY Rentals TO '/tmp/rentalsBackup.csv' DELIMITER ',' CSV HEADER;");
     var query2 = client.query("TRUNCATE Members CASCADE;");
     var query3 = client.query("COPY Members FROM '/tmp/membersBackup.csv' DELIMITER ',' CSV HEADER;");
-    var query4 = client.query("COPY Rentals FROM '/tmp/rentalsBackup.csv' DELIMITER ',' CSV HEADER;");
-
-    query1.on('end', () => {
-      done();
-    });
 
     query2.on('end', () => {
       done();
@@ -914,11 +908,6 @@ router.get('/api/v1/attendance/undo', (req, res, next) => {
 
     query3.on('end', () => {
       done();
-    });
-
-    query4.on('end', () => {
-      done();
-      return res.json(results);
     });
   });
 });
