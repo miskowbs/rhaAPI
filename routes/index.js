@@ -494,7 +494,7 @@ router.post('/api/v1/committee', (req, res, next) => {
     return res.status(400).json({ success: false, data: "This is not properly formed committee." });
   }
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionStringRDS, (err, client, done) => {
 
     if (err) {
       done();
@@ -524,7 +524,7 @@ router.put('/api/v1/committee/:id', (req, res, next) => {
 
   const id = req.params.id;
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionStringRDS, (err, client, done) => {
     if (err) {
       done();
       console.log(err);
@@ -559,7 +559,7 @@ router.delete('/api/v1/committee/:id', (req, res, next) => {
 
   const id = req.params.id;
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionStringRDS, (err, client, done) => {
     if (err) {
       done();
       console.log(err);
@@ -582,7 +582,7 @@ router.delete('/api/v1/committee/:id', (req, res, next) => {
 router.get('/api/v1/funds', (req, res, next) => {
   const results = [];
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionStringRDS, (err, client, done) => {
     if (err) {
       done();
       console;
@@ -607,7 +607,7 @@ router.get('/api/v1/funds', (req, res, next) => {
 router.get('/api/v1/floorMoney', (req, res, next) => {
   const results = [];
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionStringRDS, (err, client, done) => {
     if (err) {
       done();
       console;
@@ -634,7 +634,7 @@ router.put('/api/v1/fund/:id', (req, res, next) => {
 
   const id = req.params.id;
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionStringRDS, (err, client, done) => {
     if (err) {
       done();
       console.log(err);
