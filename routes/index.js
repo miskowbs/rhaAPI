@@ -425,7 +425,7 @@ router.delete('/api/v1/event/:id', (req, res, next) => {
       return res.status(500).json({ success: false, data: "You broke it so hard it stopped =(" });
     }
 
-    const query = client.query('DELETE FROM proposals WHERE proposal_id = $1', [id]);
+    const query = client.query('DELETE FROM proposals WHERE proposal_id = $1 CASCADE', [id]);
 
     query.on('end', () => {
       done();
