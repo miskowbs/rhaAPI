@@ -908,6 +908,7 @@ router.get('/api/v1/attendance/undo', (req, res, next) => {
 
     query3.on('end', () => {
       done();
+      return res.json(results);
     });
   });
 });
