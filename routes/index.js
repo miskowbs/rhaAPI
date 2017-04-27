@@ -140,7 +140,6 @@ router.put('/api/v1/events/:id', (req, res, next) => {
       console.log(err);
       return res.status(500).json({ success: false, data: "You broke it so hard it stopped =(" });
     }
-    /****/
     var firstQuery = createUpdateQuery(id, 'proposal_id', req.body, 'proposals');
 
     var colValues = [];
@@ -917,7 +916,6 @@ router.get('/api/v1/attendance/undo', (req, res, next) => {
     });
   });
 });
-
 router.put('/api/v1/attendance/:quarter', urlencodedParser, (req, res, next) => {
   const results = [];
 
@@ -1703,7 +1701,8 @@ function createNewEntryQuery(cols, table) {
   });
 
   query.push(toUpdate.join(', ') + ') VALUES (' + variables.join(', ') + ')');
-
+    console.log("QUERY: ")
+    console.log(query.join(' '))
   return query.join('');
 }
 module.exports = router;
