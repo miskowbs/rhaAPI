@@ -111,6 +111,7 @@ router.get('/api/v1/events/:id', (req, res, next) => {
 
 /* PUT modify an event */
 router.put('/api/v1/events/:id', (req, res, next) => {
+    console.log("PUT EVENTS");
   const results = [];
 
   const id = req.params.id;
