@@ -140,7 +140,7 @@ router.put('/api/v1/events/:id', (req, res, next) => {
       console.log(err);
       return res.status(500).json({ success: false, data: "You broke it so hard it stopped =(" });
     }
-
+    /****/
     var firstQuery = createUpdateQuery(id, 'proposal_id', req.body, 'proposals');
 
     var colValues = [];
@@ -1686,6 +1686,8 @@ function createUpdateQuery(filterVal, filter, cols, table) {
 
   query.push('Where ' + filter + ' = ' + filterVal);
 
+  console.log("QUERY:");
+  console.log(query);
   return query.join(' ');
 }
 
