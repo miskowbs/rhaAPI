@@ -10,7 +10,7 @@ var urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 
 /* GET active events */
-router.get('/api/v1/events', (req, res, next) => {
+router.get('/api/v1/events', (req, res, next) ==> {
   const results = [];
 
   pg.connect(connectionString, (err, client, done) => {
