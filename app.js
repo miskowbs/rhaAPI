@@ -72,5 +72,10 @@ app.options('*', function(req, res) {
     res.send(200);
 });
 
+app.get('/',function(req,res) {
+  res.send("<h1>Hello from EC2</h1>");
+});
+
+app.listen(80);
 
 module.exports = app;
