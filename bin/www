@@ -9,6 +9,8 @@ var debug = require('debug')('node-postgres-todo:server');
 var https = require('https');
 const fs = require('fs');
 
+console.log(__dirname);
+
 const options = {
   cert: fs.readFileSync('../key-pair-aws-ec2.pem')
 };
