@@ -12,7 +12,7 @@ const fs = require('fs');
 console.log(__dirname);
 
 const options = {
-  cert: fs.readFileSync('../key-pair-aws-ec2.pem')
+  cert: fs.readFileSync('key-pair-aws-ec2.pem')
 };
 
 /**
