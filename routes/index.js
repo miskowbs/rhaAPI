@@ -10,10 +10,10 @@ var urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 
 /* GET active events */
-router.get('/api/v1/events', (req, res, next) => {
+router.get('/api/v1/events', function(req, res, next) {
   const results = [];
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionString, function(err, client, done) {
     if (err) {
       done();
       console.log(err);
@@ -22,11 +22,11 @@ router.get('/api/v1/events', (req, res, next) => {
 
     const query = client.query('SELECT * FROM proposals WHERE event_date >= CURRENT_DATE ORDER BY event_date ASC;');
 
-    query.on('row', (row) => {
+    query.on('row', function(row) {
       results.push(row);
     });
 
-    query.on('end', () => {
+    query.on('end', function() {
       done();
       return res.json(results);
     });
@@ -34,10 +34,10 @@ router.get('/api/v1/events', (req, res, next) => {
 });
 
 /* GET all events */
-router.get('/api/v1/allEvents', (req, res, next) => {
+router.get('/api/v1/allEvents', function(req, res, next) {
   const results = [];
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionString, function(err, client, done) {
     if (err) {
       done();
       console.log(err);
@@ -46,11 +46,11 @@ router.get('/api/v1/allEvents', (req, res, next) => {
 
     const query = client.query('SELECT * FROM proposals ORDER BY proposed_date DESC;');
 
-    query.on('row', (row) => {
+    query.on('row', function(row) {
       results.push(row);
     });
 
-    query.on('end', () => {
+    query.on('end', function() {
       done();
       return res.json(results);
     });
@@ -58,10 +58,10 @@ router.get('/api/v1/allEvents', (req, res, next) => {
 });
 
 /* GET past events */
-router.get('/api/v1/pastEvents', (req, res, next) => {
+router.get('/api/v1/pastEvents', function(req, res, next) {
   const results = [];
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionString, function(err, client, done) {
     if (err) {
       done();
       console;
@@ -89,11 +89,11 @@ router.get('/api/v1/pastEvents', (req, res, next) => {
 
     const query = client.query(queryText);
 
-    query.on('row', (row) => {
+    query.on('row', function(row) {
       results.push(row);
     });
 
-    query.on('end', () => {
+    query.on('end', function() {
       done();
       return res.json(results);
     });
@@ -101,12 +101,12 @@ router.get('/api/v1/pastEvents', (req, res, next) => {
 });
 
 /* GET single event by id*/
-router.get('/api/v1/events/:id', (req, res, next) => {
+router.get('/api/v1/events/:id', function(req, res, next) {
   const results = [];
 
   const id = req.params.id;
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionString, function(err, client, done) {
     if (err) {
       done();
       console;
@@ -116,11 +116,11 @@ router.get('/api/v1/events/:id', (req, res, next) => {
 
     const query = client.query('SELECT * FROM proposals WHERE proposal_id = $1;', [id]);
 
-    query.on('row', (row) => {
+    query.on('row', function(row) {
       results.push(row);
     });
 
-    query.on('end', () => {
+    query.on('end', function() {
       done();
       return res.json(results);
     });
@@ -128,12 +128,12 @@ router.get('/api/v1/events/:id', (req, res, next) => {
 });
 
 /* PUT modify an event */
-router.put('/api/v1/events/:id', (req, res, next) => {
+router.put('/api/v1/events/:id', function(req, res, next) {
   const results = [];
 
   const id = req.params.id;
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionString, function(err, client, done) {
     if (err) {
       done();
       console.log(err);
@@ -151,11 +151,11 @@ router.put('/api/v1/events/:id', (req, res, next) => {
 
     const query = client.query('SELECT * FROM proposals WHERE proposal_id = $1', [id]);
 
-    query.on('row', (row) => {
+    query.on('row', function(row) {
       results.push(row);
     });
 
-    query.on('end', () => {
+    query.on('end', function() {
       done();
       return res.json(results);
     });
@@ -165,13 +165,13 @@ router.put('/api/v1/events/:id', (req, res, next) => {
 /*---------------------------- Member and Event Endpoint ------------------------------*/
 
 /* PUT add a member to a list of attendees */
-router.put('/api/v1/events/:event_id/attendees/:member_id', (req, res, next) => {
+router.put('/api/v1/events/:event_id/attendees/:member_id', function(req, res, next) {
   const results = [];
 
   const event_id = req.params.event_id;
   const member_id = req.params.member_id;
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionString, function(err, client, done) {
     if (err) {
       done();
       console.log(err);
@@ -184,11 +184,11 @@ router.put('/api/v1/events/:event_id/attendees/:member_id', (req, res, next) => 
 
     const query = client.query('SELECT * FROM proposals WHERE proposal_id = $1', [event_id]);
 
-    query.on('row', (row) => {
+    query.on('row', function(row) {
       results.push(row);
     });
 
-    query.on('end', () => {
+    query.on('end', function() {
       done();
       return res.json(results);
     });
@@ -196,13 +196,13 @@ router.put('/api/v1/events/:event_id/attendees/:member_id', (req, res, next) => 
 });
 
 /* DELETE remove a member from a list of attendees */
-router.delete('/api/v1/events/:event_id/attendees/:member_id', (req, res, next) => {
+router.delete('/api/v1/events/:event_id/attendees/:member_id', function(req, res, next) {
   const results = [];
 
   const event_id = req.params.event_id;
   const member_id = req.params.member_id;
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionString, function(err, client, done) {
     if (err) {
       done();
       console.log(err);
@@ -215,11 +215,11 @@ router.delete('/api/v1/events/:event_id/attendees/:member_id', (req, res, next) 
 
     const query = client.query('SELECT * FROM proposals WHERE proposal_id = $1', [event_id]);
 
-    query.on('row', (row) => {
+    query.on('row', function(row) {
       results.push(row);
     });
 
-    query.on('end', () => {
+    query.on('end', function() {
       done();
       return res.json(results);
     });
@@ -229,10 +229,10 @@ router.delete('/api/v1/events/:event_id/attendees/:member_id', (req, res, next) 
 /*---------------------------- Members Endpoints ------------------------------*/
 
 /* GET all Members */
-router.get('/api/v1/members', (req, res, next) => {
+router.get('/api/v1/members', function(req, res, next) {
   const results = [];
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionString, function(err, client, done) {
     if (err) {
       done();
       console;
@@ -242,11 +242,11 @@ router.get('/api/v1/members', (req, res, next) => {
 
     const query = client.query('SELECT * FROM members ORDER BY hall ASC, lastname ASC;');
 
-    query.on('row', (row) => {
+    query.on('row', function(row) {
       results.push(row);
     });
 
-    query.on('end', () => {
+    query.on('end', function() {
       done();
       return res.json(results);
     });
@@ -254,10 +254,10 @@ router.get('/api/v1/members', (req, res, next) => {
 });
 
 /* PUT Member */
-router.put('/api/v1/members/:username', (req, res, next) => {
+router.put('/api/v1/members/:username', function(req, res, next) {
   const results = [];
   const username = req.params.username;
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionString, function(err, client, done) {
     if (err) {
       done();
       console.log(err);
@@ -276,11 +276,11 @@ router.put('/api/v1/members/:username', (req, res, next) => {
 
     const query = client.query('SELECT * FROM members WHERE username = $1', [username]);
 
-    query.on('row', (row) => {
+    query.on('row', function(row) {
       results.push(row);
     });
 
-    query.on('end', () => {
+    query.on('end', function() {
       done();
       return res.json(results);
     });
@@ -288,10 +288,10 @@ router.put('/api/v1/members/:username', (req, res, next) => {
 });
 
 /* GET all officers (from Members) */
-router.get('/api/v1/officers', (req, res, next) => {
+router.get('/api/v1/officers', function(req, res, next) {
   const results = [];
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionString, function(err, client, done) {
     if (err) {
       done();
       console;
@@ -301,11 +301,11 @@ router.get('/api/v1/officers', (req, res, next) => {
 
     const query = client.query('SELECT * FROM members WHERE memberType IS NOT NULL ORDER BY lastname ASC;');
 
-    query.on('row', (row) => {
+    query.on('row', function(row) {
       results.push(row);
     });
 
-    query.on('end', () => {
+    query.on('end', function() {
       done();
       return res.json(results);
     });
@@ -313,12 +313,12 @@ router.get('/api/v1/officers', (req, res, next) => {
 });
 
 /* PUT modify a member */
-router.put('/api/v1/member/:id', (req, res, next) => {
+router.put('/api/v1/member/:id', function(req, res, next) {
   const results = [];
 
   const id = req.params.id;
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionString, function(err, client, done) {
     if (err) {
       done();
       console.log(err);
@@ -335,11 +335,11 @@ router.put('/api/v1/member/:id', (req, res, next) => {
 
     const query = client.query('SELECT * FROM members WHERE user_id = $1', [id]);
 
-    query.on('row', (row) => {
+    query.on('row', function(row) {
       results.push(row);
     });
 
-    query.on('end', () => {
+    query.on('end', function() {
       done();
       return res.json(results);
     });
@@ -347,7 +347,7 @@ router.put('/api/v1/member/:id', (req, res, next) => {
 });
 
 /* POST new officer (into Members) */
-router.post('/api/v1/officer', (req, res, next) => {
+router.post('/api/v1/officer', function(req, res, next) {
   const results = [];
 
   const data = { username: req.body.username, firstname: req.body.firstname, lastname: req.body.lastname, hall: req.body.hall, image: req.body.image, memberType: req.body.memberType, CM: req.body.CM, phoneNumber: req.body.phoneNumber, roomNumber: req.body.roomNumber };
@@ -356,7 +356,7 @@ router.post('/api/v1/officer', (req, res, next) => {
     return res.status(400).json({ success: false, data: "This is not a properly formed officer." });
   }
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionString, function(err, client, done) {
 
     if (err) {
       done();
@@ -369,11 +369,11 @@ router.post('/api/v1/officer', (req, res, next) => {
 
     const query = client.query('SELECT * FROM members WHERE username = $1', [data.username]);
 
-    query.on('row', (row) => {
+    query.on('row', function(row) {
       results.push(row);
     });
 
-    query.on('end', () => {
+    query.on('end', function() {
       done();
       return res.json(results);
     });
@@ -381,10 +381,10 @@ router.post('/api/v1/officer', (req, res, next) => {
 });
 
 /* GET all active members */
-router.get('/api/v1/activeMembers', (req, res, next) => {
+router.get('/api/v1/activeMembers', function(req, res, next) {
   const results = [];
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionString, function(err, client, done) {
     if (err) {
       done();
       console;
@@ -394,11 +394,11 @@ router.get('/api/v1/activeMembers', (req, res, next) => {
 
     const query = client.query('SELECT * FROM members WHERE active IS TRUE ORDER BY lastname ASC;');
 
-    query.on('row', (row) => {
+    query.on('row', function(row) {
       results.push(row);
     });
 
-    query.on('end', () => {
+    query.on('end', function() {
       done();
       return res.json(results);
     });
@@ -406,12 +406,12 @@ router.get('/api/v1/activeMembers', (req, res, next) => {
 });
 
 /* DELETE an event */
-router.delete('/api/v1/event/:id', (req, res, next) => {
+router.delete('/api/v1/event/:id', function(req, res, next) {
   const results = [];
 
   const id = req.params.id;
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionString, function(err, client, done) {
     if (err) {
       done();
       console.log(err);
@@ -420,7 +420,7 @@ router.delete('/api/v1/event/:id', (req, res, next) => {
 
     const query = client.query('DELETE FROM proposals WHERE proposal_id = $1', [id]);
 
-    query.on('end', () => {
+    query.on('end', function() {
       done();
       return res.json(results);
     });
@@ -428,12 +428,12 @@ router.delete('/api/v1/event/:id', (req, res, next) => {
 });
 
 /* DELETE a member */
-router.delete('/api/v1/member/:id', (req, res, next) => {
+router.delete('/api/v1/member/:id', function(req, res, next) {
   const results = [];
 
   const id = req.params.id;
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionString, function(err, client, done) {
     if (err) {
       done();
       console.log(err);
@@ -442,7 +442,7 @@ router.delete('/api/v1/member/:id', (req, res, next) => {
 
     const query = client.query('DELETE FROM members WHERE user_id = $1', [id]);
 
-    query.on('end', () => {
+    query.on('end', function() {
       done();
       return res.json(results);
     });
@@ -454,10 +454,10 @@ router.delete('/api/v1/member/:id', (req, res, next) => {
 
 
 /* GET all committees */
-router.get('/api/v1/committees', (req, res, next) => {
+router.get('/api/v1/committees', function(req, res, next) {
   const results = [];
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionString, function(err, client, done) {
     if (err) {
       done();
       console;
@@ -467,11 +467,11 @@ router.get('/api/v1/committees', (req, res, next) => {
 
     const query = client.query('SELECT * FROM committee ORDER BY committeeName ASC;');
 
-    query.on('row', (row) => {
+    query.on('row', function(row) {
       results.push(row);
     });
 
-    query.on('end', () => {
+    query.on('end', function() {
       done();
       return res.json(results);
     });
@@ -479,7 +479,7 @@ router.get('/api/v1/committees', (req, res, next) => {
 });
 
 /* POST a new committee */
-router.post('/api/v1/committee', (req, res, next) => {
+router.post('/api/v1/committee', function(req, res, next) {
   const results = [];
 
   const data = { committeeName: req.body.committeeName, image: req.body.image, description: req.body.description };
@@ -488,7 +488,7 @@ router.post('/api/v1/committee', (req, res, next) => {
     return res.status(400).json({ success: false, data: "This is not properly formed committee." });
   }
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionString, function(err, client, done) {
 
     if (err) {
       done();
@@ -501,11 +501,11 @@ router.post('/api/v1/committee', (req, res, next) => {
 
     const query = client.query('SELECT * FROM committee WHERE committeeName = $1', [data.committeeName]);
 
-    query.on('row', (row) => {
+    query.on('row', function(row) {
       results.push(row);
     });
 
-    query.on('end', () => {
+    query.on('end', function() {
       done();
       return res.json(results);
     });
@@ -513,12 +513,12 @@ router.post('/api/v1/committee', (req, res, next) => {
 });
 
 /* PUT modify a committee */
-router.put('/api/v1/committee/:id', (req, res, next) => {
+router.put('/api/v1/committee/:id', function(req, res, next) {
   const results = [];
 
   const id = req.params.id;
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionString, function(err, client, done) {
     if (err) {
       done();
       console.log(err);
@@ -536,11 +536,11 @@ router.put('/api/v1/committee/:id', (req, res, next) => {
 
     const query = client.query('SELECT * FROM committee WHERE committeeid = $1', [id]);
 
-    query.on('row', (row) => {
+    query.on('row', function(row) {
       results.push(row);
     });
 
-    query.on('end', () => {
+    query.on('end', function() {
       done();
       return res.json(results);
     });
@@ -548,12 +548,12 @@ router.put('/api/v1/committee/:id', (req, res, next) => {
 });
 
 /* DELETE a committee */
-router.delete('/api/v1/committee/:id', (req, res, next) => {
+router.delete('/api/v1/committee/:id', function(req, res, next) {
   const results = [];
 
   const id = req.params.id;
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionString, function(err, client, done) {
     if (err) {
       done();
       console.log(err);
@@ -562,7 +562,7 @@ router.delete('/api/v1/committee/:id', (req, res, next) => {
 
     const query = client.query('DELETE FROM committee WHERE committeeid = $1', [id]);
 
-    query.on('end', () => {
+    query.on('end', function() {
       done();
       return res.json(results);
     });
@@ -573,10 +573,10 @@ router.delete('/api/v1/committee/:id', (req, res, next) => {
 
 
 /* GET all funds */
-router.get('/api/v1/funds', (req, res, next) => {
+router.get('/api/v1/funds', function(req, res, next) {
   const results = [];
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionString, function(err, client, done) {
     if (err) {
       done();
       console;
@@ -586,11 +586,11 @@ router.get('/api/v1/funds', (req, res, next) => {
 
     const query = client.query('SELECT * FROM funds ORDER BY funds_id ASC;');
 
-    query.on('row', (row) => {
+    query.on('row', function(row) {
       results.push(row);
     });
 
-    query.on('end', () => {
+    query.on('end', function() {
       done();
       return res.json(results);
     });
@@ -598,10 +598,10 @@ router.get('/api/v1/funds', (req, res, next) => {
 });
 
 /* GET all funds (floor money) */
-router.get('/api/v1/floorMoney', (req, res, next) => {
+router.get('/api/v1/floorMoney', function(req, res, next) {
   const results = [];
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionString, function(err, client, done) {
     if (err) {
       done();
       console;
@@ -611,11 +611,11 @@ router.get('/api/v1/floorMoney', (req, res, next) => {
 
     const query = client.query('SELECT * FROM floorMoney ORDER BY hall_and_floor ASC;');
 
-    query.on('row', (row) => {
+    query.on('row', function(row) {
       results.push(row);
     });
 
-    query.on('end', () => {
+    query.on('end', function() {
       done();
       return res.json(results);
     });
@@ -623,12 +623,12 @@ router.get('/api/v1/floorMoney', (req, res, next) => {
 });
 
 /* PUT modify a fund */
-router.put('/api/v1/fund/:id', (req, res, next) => {
+router.put('/api/v1/fund/:id', function(req, res, next) {
   const results = [];
 
   const id = req.params.id;
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionString, function(err, client, done) {
     if (err) {
       done();
       console.log(err);
@@ -646,11 +646,11 @@ router.put('/api/v1/fund/:id', (req, res, next) => {
 
     const query = client.query('SELECT * FROM funds WHERE funds_id = $1', [id]);
 
-    query.on('row', (row) => {
+    query.on('row', function(row) {
       results.push(row);
     });
 
-    query.on('end', () => {
+    query.on('end', function() {
       done();
       return res.json(results);
     });
@@ -658,12 +658,12 @@ router.put('/api/v1/fund/:id', (req, res, next) => {
 });
 
 /* PUT to add to additions (funds table) */
-router.put('/api/v1/addition', (req, res, next) => {
+router.put('/api/v1/addition', function(req, res, next) {
   const results = [];
 
   const id = req.params.id;
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionString, function(err, client, done) {
     if (err) {
       done();
       console.log(err);
@@ -673,11 +673,11 @@ router.put('/api/v1/addition', (req, res, next) => {
 
     const query = client.query('SELECT * FROM add_additions($1)', [reqJson.addition]);
 
-    query.on('row', (row) => {
+    query.on('row', function(row) {
       results.push(row);
     });
 
-    query.on('end', () => {
+    query.on('end', function() {
       done();
       return res.json(results);
     });
@@ -686,10 +686,10 @@ router.put('/api/v1/addition', (req, res, next) => {
 
 /*---------------------------- Payments / Expenses Endpoints ------------------------------*/
 /* GET all payments (expenses) */
-router.get('/api/v1/payments', (req, res, next) => {
+router.get('/api/v1/payments', function(req, res, next) {
   const results = [];
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionString, function(err, client, done) {
     if (err) {
       done();
       console;
@@ -711,11 +711,11 @@ router.get('/api/v1/payments', (req, res, next) => {
 
     const query = client.query('SELECT * FROM expenses WHERE (EXTRACT(MONTH FROM dateReceived) <= 6 AND EXTRACT(YEAR FROM dateReceived) = ' + necessaryYearLessThanSix + ') OR (EXTRACT(MONTH FROM dateReceived) > 6 AND EXTRACT(YEAR FROM dateReceived) = ' + necessaryYearMoreThanSix + ') ORDER BY expenses_id ASC;');
 
-    query.on('row', (row) => {
+    query.on('row', function(row) {
       results.push(row);
     });
 
-    query.on('end', () => {
+    query.on('end', function() {
       done();
       return res.json(results);
     });
@@ -723,12 +723,12 @@ router.get('/api/v1/payments', (req, res, next) => {
 });
 
 /* GET single payment (expense) by id*/
-router.get('/api/v1/payment/:id', (req, res, next) => {
+router.get('/api/v1/payment/:id', function(req, res, next) {
   const results = [];
 
   const id = req.params.id;
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionString, function(err, client, done) {
     if (err) {
       done();
       console;
@@ -738,11 +738,11 @@ router.get('/api/v1/payment/:id', (req, res, next) => {
 
     const query = client.query('SELECT * FROM expenses WHERE expenses_id = $1;', [id]);
 
-    query.on('row', (row) => {
+    query.on('row', function(row) {
       results.push(row);
     });
 
-    query.on('end', () => {
+    query.on('end', function() {
       done();
       return res.json(results);
     });
@@ -753,7 +753,7 @@ router.get('/api/v1/payment/:id', (req, res, next) => {
 router.post('/api/v1/payment', urlencodedParser, function (req, res, next) {
   const results = [];
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionString, function(err, client, done) {
 
     if (err) {
       done();
@@ -774,11 +774,11 @@ router.post('/api/v1/payment', urlencodedParser, function (req, res, next) {
 
     const query = client.query('SELECT * FROM expenses WHERE proposal_id = $1 and CM = $2 and receiver = $3 and amountUsed = $4 and description = $5 and accountCode = $6', [reqJson.proposal_id, reqJson.CM, reqJson.receiver, reqJson.amountUsed, reqJson.description, reqJson.accountCode])
 
-    query.on('row', (row) => {
+    query.on('row', function(row) {
       results.push(row);
     });
 
-    query.on('end', () => {
+    query.on('end', function() {
       done();
       return res.json(results);
     });
@@ -786,12 +786,12 @@ router.post('/api/v1/payment', urlencodedParser, function (req, res, next) {
 });
 
 /* PUT modify a payment (expense) */
-router.put('/api/v1/payment/:id', (req, res, next) => {
+router.put('/api/v1/payment/:id', function(req, res, next) {
   const results = [];
 
   const id = req.params.id;
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionString, function(err, client, done) {
     if (err) {
       done();
       console.log(err);
@@ -809,11 +809,11 @@ router.put('/api/v1/payment/:id', (req, res, next) => {
 
     const query = client.query('SELECT * FROM expenses WHERE expenses_id = $1', [id]);
 
-    query.on('row', (row) => {
+    query.on('row', function(row) {
       results.push(row);
     });
 
-    query.on('end', () => {
+    query.on('end', function() {
       done();
       return res.json(results);
     });
@@ -821,12 +821,12 @@ router.put('/api/v1/payment/:id', (req, res, next) => {
 });
 
 /* DELETE a payment (expense) */
-router.delete('/api/v1/payment/:id', (req, res, next) => {
+router.delete('/api/v1/payment/:id', function(req, res, next) {
   const results = [];
 
   const id = req.params.id;
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionString, function(err, client, done) {
     if (err) {
       done();
       console.log(err);
@@ -835,7 +835,7 @@ router.delete('/api/v1/payment/:id', (req, res, next) => {
 
     const query = client.query('DELETE FROM expenses WHERE expenses_id = $1', [id]);
 
-    query.on('end', () => {
+    query.on('end', function() {
       done();
       return res.json(results);
     });
@@ -849,7 +849,7 @@ router.delete('/api/v1/payment/:id', (req, res, next) => {
 router.post('/api/v1/proposal', urlencodedParser, function (req, res, next) {
   const results = [];
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionString, function(err, client, done) {
 
     if (err) {
       done();
@@ -870,11 +870,11 @@ router.post('/api/v1/proposal', urlencodedParser, function (req, res, next) {
 
     const query = client.query('SELECT * FROM proposals WHERE proposal_name = $1', [reqJson.proposal_name])
 
-    query.on('row', (row) => {
+    query.on('row', function(row) {
       results.push(row);
     });
 
-    query.on('end', () => {
+    query.on('end', function() {
       done();
       return res.json(results);
     });
@@ -883,10 +883,10 @@ router.post('/api/v1/proposal', urlencodedParser, function (req, res, next) {
 
 /*---------------------------- Attendance Endpoints ------------------------------*/
 
-router.get('/api/v1/attendance/undo', (req, res, next) => {
+router.get('/api/v1/attendance/undo', function(req, res, next) {
   const results = "It worked!";
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionString, function(err, client, done) {
     if (err) {
       done();
       console.log(err);
@@ -898,32 +898,32 @@ router.get('/api/v1/attendance/undo', (req, res, next) => {
     var query3 = client.query("COPY Members FROM '/tmp/membersBackup.csv' DELIMITER ',' CSV HEADER;");
     var query4 = client.query("COPY Rentals FROM '/tmp/rentalsBackup.csv' DELIMITER ',' CSV HEADER;");
 
-    query1.on('end', () => {
+    query1.on('end', function() {
       done();
     });
 
-    query2.on('end', () => {
+    query2.on('end', function() {
       done();
     });
 
-    query3.on('end', () => {
+    query3.on('end', function() {
       done();
     });
 
-    query4.on('end', () => {
+    query4.on('end', function() {
       done();
       return res.json(results);
     });
   });
 });
 
-router.put('/api/v1/attendance/:quarter', urlencodedParser, (req, res, next) => {
+router.put('/api/v1/attendance/:quarter', urlencodedParser, function(req, res, next) {
   const results = [];
 
   var quarter = req.params.quarter;
 
   var sortedUsernames = req.body.membersToUpdate;
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionString, function(err, client, done) {
     if (err) {
       done();
       console.log(err);
@@ -934,16 +934,16 @@ router.put('/api/v1/attendance/:quarter', urlencodedParser, (req, res, next) => 
     var query = client.query("SELECT username, meet_attend from members ORDER BY username ASC;");
     var backup = client.query("COPY Members TO '/tmp/membersBackup.csv' DELIMITER ',' CSV HEADER;");
 
-    backup.on('end', () => {
+    backup.on('end', function() {
       done(); //For catching errors if copy statement is wrong
     });
 
-    query.on('row', (row) => {
+    query.on('row', function(row) {
       results.push(row);
       nameAndAttendance.push({ username: row.username, meet_attend: row.meet_attend });
     });
 
-    query.on('end', () => {
+    query.on('end', function() {
       done();
       nameAndAttendance.forEach(function (e) {
         var insertAttendance = "UPDATE members SET meet_attend = $1 WHERE username = $2;";
@@ -997,11 +997,11 @@ router.put('/api/v1/attendance/:quarter', urlencodedParser, (req, res, next) => 
 
     var query2 = client.query("SELECT username, meet_attend from members ORDER BY username ASC;");
 
-    query2.on('row', (row) => {
+    query2.on('row', function(row) {
       results.push({ username: row.username, meet_attend: row.meet_attend });
     });
 
-    query2.on('end', () => {
+    query2.on('end', function() {
       return res.json(results);
     });
   });
@@ -1011,10 +1011,10 @@ router.put('/api/v1/attendance/:quarter', urlencodedParser, (req, res, next) => 
 /* -------------------------- Expenses Endpoints -----------------------------------*/
 
 /* GET floor awards value */
-router.post('/api/v1/awardsOnly', (req, res, next) => {
+router.post('/api/v1/awardsOnly', function(req, res, next) {
   const results = [];
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionString, function(err, client, done) {
     if (err) {
       done();
       console.log(err);
@@ -1023,11 +1023,11 @@ router.post('/api/v1/awardsOnly', (req, res, next) => {
 
     const query = client.query('SELECT * FROM sum_only_awards($1)', [req.body.floorName]);
 
-    query.on('row', (row) => {
+    query.on('row', function(row) {
       results.push(row);
     });
 
-    query.on('end', () => {
+    query.on('end', function() {
       done();
       return res.json(results);
     });
@@ -1035,10 +1035,10 @@ router.post('/api/v1/awardsOnly', (req, res, next) => {
 });
 
 /* GET floor expenses value */
-router.post('/api/v1/expensesOnly', (req, res, next) => {
+router.post('/api/v1/expensesOnly', function(req, res, next) {
   const results = [];
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionString, function(err, client, done) {
     if (err) {
       done();
       console.log(err);
@@ -1047,11 +1047,11 @@ router.post('/api/v1/expensesOnly', (req, res, next) => {
 
     const query = client.query('SELECT * FROM sum_only_expenses($1)', [req.body.floorName]);
 
-    query.on('row', (row) => {
+    query.on('row', function(row) {
       results.push(row);
     });
 
-    query.on('end', () => {
+    query.on('end', function() {
       done();
       return res.json(results);
     });
@@ -1061,10 +1061,10 @@ router.post('/api/v1/expensesOnly', (req, res, next) => {
 /*---------------------------- Floor Expenses Endpoints ------------------------------*/
 
 /* GET all floor expenses */
-router.get('/api/v1/floorExpenses', (req, res, next) => {
+router.get('/api/v1/floorExpenses', function(req, res, next) {
   const results = [];
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionString, function(err, client, done) {
     if (err) {
       done();
       console;
@@ -1074,11 +1074,11 @@ router.get('/api/v1/floorExpenses', (req, res, next) => {
 
     const query = client.query('SELECT * FROM floorExpenses ORDER BY floor_expense_id ASC;');
 
-    query.on('row', (row) => {
+    query.on('row', function(row) {
       results.push(row);
     });
 
-    query.on('end', () => {
+    query.on('end', function() {
       done();
       return res.json(results);
     });
@@ -1086,7 +1086,7 @@ router.get('/api/v1/floorExpenses', (req, res, next) => {
 });
 
 /* POST a new floor expense */
-router.post('/api/v1/floorExpense', (req, res, next) => {
+router.post('/api/v1/floorExpense', function(req, res, next) {
   const results = [];
 
   const data = { floor_id: req.body.floor_id, event_description: req.body.event_description, amount: req.body.amount, turned_in_date: req.body.turned_in_date, processed_date: req.body.processed_date };
@@ -1095,7 +1095,7 @@ router.post('/api/v1/floorExpense', (req, res, next) => {
     return res.status(400).json({ success: false, data: "This is not a properly formed floor expense." });
   }
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionString, function(err, client, done) {
 
     if (err) {
       done();
@@ -1108,11 +1108,11 @@ router.post('/api/v1/floorExpense', (req, res, next) => {
 
     const query = client.query('SELECT * FROM floorExpenses, floorMoney WHERE floorExpenses.event_description = $1 and floorExpenses.amount = $2 and floorExpenses.turned_in_date = $3 and floorExpenses.processed_date = $4 and floorMoney.floorMoney_id = floorExpenses.floor_id', [data.event_description, data.amount, data.turned_in_date, data.processed_date])
 
-    query.on('row', (row) => {
+    query.on('row', function(row) {
       results.push(row);
     });
 
-    query.on('end', () => {
+    query.on('end', function() {
       done();
       return res.json(results);
     });
@@ -1123,7 +1123,7 @@ router.post('/api/v1/floorExpense', (req, res, next) => {
 // router.post('/api/v1/floorExpense', urlencodedParser, function(req, res, next) {
 //   const results= [];
 
-//   pg.connect(connectionString, (err, client, done) => {
+//   pg.connect(connectionString, function(err, client, done) {
 
 //     if(err) {
 //       done();
@@ -1144,11 +1144,11 @@ router.post('/api/v1/floorExpense', (req, res, next) => {
 
 //     const query = client.query('SELECT * FROM floorExpenses, floorMoney WHERE floorExpenses.event_description = $1 and floorExpenses.amount = $2 and floorExpenses.turned_in_date = $3 and floorExpenses.processed_date = $4 and floorMoney.hall_and_floor = $5 and floorMoney.floorMoney_id = floorExpenses.floor_id', [reqJson.event_description, reqJson.amount, reqJson.turned_in_date, reqJson.processed_date, reqJson.hall_and_floor] )
 
-//     query.on('row', (row) => {
+//     query.on('row', function(row) {
 //       results.push(row);
 //     });
 
-//     query.on('end', () => {
+//     query.on('end', function() {
 //       done();
 //       return res.json(results);
 //     });
@@ -1158,12 +1158,12 @@ router.post('/api/v1/floorExpense', (req, res, next) => {
 
 
 /* GET single payment (expense) by id*/
-router.get('/api/v1/floorExpense/:id', (req, res, next) => {
+router.get('/api/v1/floorExpense/:id', function(req, res, next) {
   const results = [];
 
   const id = req.params.id;
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionString, function(err, client, done) {
     if (err) {
       done();
       console.log(err);
@@ -1172,11 +1172,11 @@ router.get('/api/v1/floorExpense/:id', (req, res, next) => {
 
     const query = client.query('SELECT * FROM floorExpenses WHERE floor_expense_id = $1;', [id]);
 
-    query.on('row', (row) => {
+    query.on('row', function(row) {
       results.push(row);
     });
 
-    query.on('end', () => {
+    query.on('end', function() {
       done();
       return res.json(results);
     });
@@ -1184,12 +1184,12 @@ router.get('/api/v1/floorExpense/:id', (req, res, next) => {
 });
 
 /* PUT modify a payment (floorExpense) */
-router.put('/api/v1/floorExpense/:id', (req, res, next) => {
+router.put('/api/v1/floorExpense/:id', function(req, res, next) {
   const results = [];
 
   const id = req.params.id;
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionString, function(err, client, done) {
     if (err) {
       done();
       console.log(err);
@@ -1207,11 +1207,11 @@ router.put('/api/v1/floorExpense/:id', (req, res, next) => {
 
     const query = client.query('SELECT * FROM floorExpenses WHERE floor_expense_id = $1', [id]);
 
-    query.on('row', (row) => {
+    query.on('row', function(row) {
       results.push(row);
     });
 
-    query.on('end', () => {
+    query.on('end', function() {
       done();
       return res.json(results);
     });
@@ -1219,12 +1219,12 @@ router.put('/api/v1/floorExpense/:id', (req, res, next) => {
 });
 
 /* DELETE a payment (expense) */
-router.delete('/api/v1/floorExpense/:id', (req, res, next) => {
+router.delete('/api/v1/floorExpense/:id', function(req, res, next) {
   const results = [];
 
   const id = req.params.id;
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionString, function(err, client, done) {
     if (err) {
       done();
       console.log(err);
@@ -1233,7 +1233,7 @@ router.delete('/api/v1/floorExpense/:id', (req, res, next) => {
 
     const query = client.query('DELETE FROM floorExpenses WHERE floor_expense_id = $1', [id]);
 
-    query.on('end', () => {
+    query.on('end', function() {
       done();
       return res.json(results);
     });
@@ -1248,10 +1248,10 @@ router.delete('/api/v1/floorExpense/:id', (req, res, next) => {
 */
 
 /* GET attendance of floor given a quarter */
-router.post('/api/v1/floorAttendance', (req, res, next) => {
+router.post('/api/v1/floorAttendance', function(req, res, next) {
   const results = [];
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionString, function(err, client, done) {
     if (err) {
       done();
       console.log(err);
@@ -1260,11 +1260,11 @@ router.post('/api/v1/floorAttendance', (req, res, next) => {
 
     const query = client.query('SELECT * FROM count_attendance_for_floor($1, $2)', [req.body.floorName, req.body.quarter]);
 
-    query.on('row', (row) => {
+    query.on('row', function(row) {
       results.push(row);
     });
 
-    query.on('end', () => {
+    query.on('end', function() {
       done();
       return res.json(results);
     });
@@ -1272,10 +1272,10 @@ router.post('/api/v1/floorAttendance', (req, res, next) => {
 });
 
 /* GET money used for a given proposal_id */
-router.post('/api/v1/getMoneyUsed', (req, res, next) => {
+router.post('/api/v1/getMoneyUsed', function(req, res, next) {
   const results = [];
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionString, function(err, client, done) {
     if (err) {
       done();
       console.log(err);
@@ -1284,11 +1284,11 @@ router.post('/api/v1/getMoneyUsed', (req, res, next) => {
 
     const query = client.query('SELECT * FROM get_money_used($1)', [req.body.proposal_id]);
 
-    query.on('row', (row) => {
+    query.on('row', function(row) {
       results.push(row);
     });
 
-    query.on('end', () => {
+    query.on('end', function() {
       done();
       return res.json(results);
     });
@@ -1297,10 +1297,10 @@ router.post('/api/v1/getMoneyUsed', (req, res, next) => {
 
 
 /* Just calls the update_floor_money() function */
-router.get('/api/v1/updateFloorMoney', (req, res, next) => {
+router.get('/api/v1/updateFloorMoney', function(req, res, next) {
   const results = [];
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionString, function(err, client, done) {
     if (err) {
       done();
       console.log(err);
@@ -1309,11 +1309,11 @@ router.get('/api/v1/updateFloorMoney', (req, res, next) => {
 
     const query = client.query('SELECT * FROM update_floor_money()');
 
-    query.on('row', (row) => {
+    query.on('row', function(row) {
       results.push(row);
     });
 
-    query.on('end', () => {
+    query.on('end', function() {
       done();
       return res.json(results);
     });
@@ -1322,10 +1322,10 @@ router.get('/api/v1/updateFloorMoney', (req, res, next) => {
 
 
 /* Calls the postgres function purgeMembers() */
-router.get('/api/v1/purgeMembers', (req, res, next) => {
+router.get('/api/v1/purgeMembers', function(req, res, next) {
   const results = [];
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionString, function(err, client, done) {
     if (err) {
       done();
       console.log(err);
@@ -1334,11 +1334,11 @@ router.get('/api/v1/purgeMembers', (req, res, next) => {
 
     const query = client.query('SELECT * FROM purgeMembers()');
 
-    query.on('row', (row) => {
+    query.on('row', function(row) {
       results.push(row);
     });
 
-    query.on('end', () => {
+    query.on('end', function() {
       done();
       return res.json(results);
     });
@@ -1347,10 +1347,10 @@ router.get('/api/v1/purgeMembers', (req, res, next) => {
 
 
 /* Calls the postgres function backup_members_table() */
-router.get('/api/v1/undoPurge', (req, res, next) => {
+router.get('/api/v1/undoPurge', function(req, res, next) {
   const results = [];
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionString, function(err, client, done) {
     if (err) {
       done();
       console.log(err);
@@ -1359,11 +1359,11 @@ router.get('/api/v1/undoPurge', (req, res, next) => {
 
     const query = client.query('SELECT * FROM undoPurge()');
 
-    query.on('row', (row) => {
+    query.on('row', function(row) {
       results.push(row);
     });
 
-    query.on('end', () => {
+    query.on('end', function() {
       done();
       return res.json(results);
     });
@@ -1371,12 +1371,12 @@ router.get('/api/v1/undoPurge', (req, res, next) => {
 });
 
 /* POST new equipment data */
-router.post('/api/v1/equipment', (req, res, next) => {
+router.post('/api/v1/equipment', function(req, res, next) {
   const results = [];
 
   const data = { equipmentName: req.body.equipmentName, equipmentEmbed: req.body.equipmentEmbed };
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionString, function(err, client, done) {
 
     if (err) {
       done();
@@ -1395,11 +1395,11 @@ router.post('/api/v1/equipment', (req, res, next) => {
 
     const query = client.query('SELECT * FROM equipment WHERE equipmentName = $1', [data.equipmentName]);
 
-    query.on('row', (row) => {
+    query.on('row', function(row) {
       results.push(row);
     });
 
-    query.on('end', () => {
+    query.on('end', function() {
       done();
       return res.json(results);
     });
@@ -1407,12 +1407,12 @@ router.post('/api/v1/equipment', (req, res, next) => {
 });
 
 /* DELETE given equipment data */
-router.delete('/api/v1/equipment/:id', (req, res, next) => {
+router.delete('/api/v1/equipment/:id', function(req, res, next) {
   const results = [];
 
   const id = req.params.id;
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionString, function(err, client, done) {
     if (err) {
       done();
       console.log(err);
@@ -1425,11 +1425,11 @@ router.delete('/api/v1/equipment/:id', (req, res, next) => {
 
     const query = client.query('SELECT * FROM equipment WHERE equipmentID = $1', [id]);
 
-    query.on('row', (row) => {
+    query.on('row', function(row) {
       results.push(row);
     });
 
-    query.on('end', () => {
+    query.on('end', function() {
       done();
       return res.json(results);
     });
@@ -1439,9 +1439,9 @@ router.delete('/api/v1/equipment/:id', (req, res, next) => {
 /*---------------------------- Equipment Endpoints ------------------------------*/
 
 /* GET all equipment data */
-router.get('/api/v1/equipment', (req, res, next) => {
+router.get('/api/v1/equipment', function(req, res, next) {
   const results = [];
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionString, function(err, client, done) {
     if (err) {
       done();
       console.log(err);
@@ -1449,11 +1449,11 @@ router.get('/api/v1/equipment', (req, res, next) => {
     }
 
     const query = client.query('SELECT * FROM equipment;');
-    query.on('row', (row) => {
+    query.on('row', function(row) {
       results.push(row);
     });
 
-    query.on('end', () => {
+    query.on('end', function() {
       done();
       return res.json(results);
     });
@@ -1464,11 +1464,11 @@ router.get('/api/v1/equipment', (req, res, next) => {
 /*---------------------------- InfoText Endpoints ------------------------------*/
 
 /* GET an InfoText */
-router.get('/api/v1/infoText/:id', (req, res, next) => {
+router.get('/api/v1/infoText/:id', function(req, res, next) {
   const results = [];
 
   const id = req.params.id;
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionString, function(err, client, done) {
     if (err) {
       done();
       console.log(err);
@@ -1476,11 +1476,11 @@ router.get('/api/v1/infoText/:id', (req, res, next) => {
     }
 
     const query = client.query('SELECT * FROM infoText WHERE info_text_id = $1;', [id]);
-    query.on('row', (row) => {
+    query.on('row', function(row) {
       results.push(row);
     });
 
-    query.on('end', () => {
+    query.on('end', function() {
       done();
       return res.json(results[0]);
     });
@@ -1488,12 +1488,12 @@ router.get('/api/v1/infoText/:id', (req, res, next) => {
 });
 
 /* PUT modify an InfoText */
-router.put('/api/v1/infoText/:id', (req, res, next) => {
+router.put('/api/v1/infoText/:id', function(req, res, next) {
   const results = [];
 
   const id = req.params.id;
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionString, function(err, client, done) {
     if (err) {
       done();
       console.log(err);
@@ -1510,11 +1510,11 @@ router.put('/api/v1/infoText/:id', (req, res, next) => {
 
     const query = client.query('SELECT * FROM infoText WHERE info_text_id = $1', [id]);
 
-    query.on('row', (row) => {
+    query.on('row', function(row) {
       results.push(row);
     });
 
-    query.on('end', () => {
+    query.on('end', function() {
       done();
       return res.json(results);
     });
@@ -1523,10 +1523,10 @@ router.put('/api/v1/infoText/:id', (req, res, next) => {
 
 /*------------------------ Gallery Endpoints -----------------------------*/
 
-router.get('/api/v1/photoGalleryAll', (req, res, next) => {
+router.get('/api/v1/photoGalleryAll', function(req, res, next) {
   const results = [];
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionString, function(err, client, done) {
     if (err) {
       done();
       console.log(err);
@@ -1535,21 +1535,21 @@ router.get('/api/v1/photoGalleryAll', (req, res, next) => {
 
     const query = client.query('SELECT * FROM photoGallery');
 
-    query.on('row', (row) => {
+    query.on('row', function(row) {
       results.push(row);
     });
 
-    query.on('end', () => {
+    query.on('end', function() {
       done();
       return res.json(results);
     });
   });
 });
 
-router.get('/api/v1/photoGalleryRestricted', (req, res, next) => {
+router.get('/api/v1/photoGalleryRestricted', function(req, res, next) {
   const results = [];
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionString, function(err, client, done) {
     if (err) {
       done();
       console.log(err);
@@ -1558,23 +1558,23 @@ router.get('/api/v1/photoGalleryRestricted', (req, res, next) => {
 
     const query = client.query('SELECT * FROM photoGallery WHERE approved = \'approved\';');
 
-    query.on('row', (row) => {
+    query.on('row', function(row) {
       results.push(row);
     });
 
-    query.on('end', () => {
+    query.on('end', function() {
       done();
       return res.json(results);
     });
   });
 });
 
-router.put('/api/v1/photoGallery/:id', (req, res, next) => {
+router.put('/api/v1/photoGallery/:id', function(req, res, next) {
   const results = [];
 
   const id = req.params.id;
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionString, function(err, client, done) {
     if (err) {
       done();
       console.log(err);
@@ -1592,18 +1592,18 @@ router.put('/api/v1/photoGallery/:id', (req, res, next) => {
 
     const query = client.query('SELECT * FROM photoGallery WHERE photo_gallery_id = $1', [id]);
 
-    query.on('row', (row) => {
+    query.on('row', function(row) {
       results.push(row);
     });
 
-    query.on('end', () => {
+    query.on('end', function() {
       done();
       return res.json(results);
     });
   });
 });
 
-router.post('/api/v1/photoGallery', (req, res, next) => {
+router.post('/api/v1/photoGallery', function(req, res, next) {
   const results = [];
 
   const data = { path_to_photo: req.body.path_to_photo, approved: req.body.approved };
@@ -1612,7 +1612,7 @@ router.post('/api/v1/photoGallery', (req, res, next) => {
     return res.status(400).json({ success: false, data: "This is not a properly formed gallery photo object." });
   }
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionString, function(err, client, done) {
 
     if (err) {
       done();
@@ -1631,23 +1631,23 @@ router.post('/api/v1/photoGallery', (req, res, next) => {
 
     const query = client.query('SELECT * FROM photoGallery WHERE path_to_photo = $1', [data.path_to_photo]);
 
-    query.on('row', (row) => {
+    query.on('row', function(row) {
       results.push(row);
     });
 
-    query.on('end', () => {
+    query.on('end', function() {
       done();
       return res.json(results);
     });
   });
 });
 
-router.delete('/api/v1/photoGallery/:id', (req, res, next) => {
+router.delete('/api/v1/photoGallery/:id', function(req, res, next) {
   const results = [];
 
   const id = req.params.id;
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionString, function(err, client, done) {
     if (err) {
       done();
       console.log(err);
@@ -1660,11 +1660,11 @@ router.delete('/api/v1/photoGallery/:id', (req, res, next) => {
 
     const query = client.query('SELECT * FROM photoGallery WHERE photo_gallery_id = $1', [id]);
 
-    query.on('row', (row) => {
+    query.on('row', function(row) {
       results.push(row);
     });
 
-    query.on('end', () => {
+    query.on('end', function() {
       done();
       return res.json(results);
     });
