@@ -9,11 +9,11 @@ var debug = require('debug')('node-postgres-todo:server');
 var https = require('https');
 const fs = require('fs');
 
-const options = {
-  key: fs.readFileSync('ca-key.pem'),
-  cert: fs.readFileSync('ca-crt.pem')
+var options = { 
+    key: fs.readFileSync('server-key.pem'), 
+    cert: fs.readFileSync('server-crt.pem'), 
+    ca: fs.readFileSync('ca-crt.pem'), 
 };
-
 /**
  * Get port from environment and store in Express.
  */
