@@ -3,9 +3,8 @@ var router = express.Router();
 // var https = express.createServer();
 var pg = require('pg');
 var path = require('path');
-var connectionString = process.env.DATABASE_URL || 'postgres://postgres:rhasite@rha-website-0.csse.rose-hulman.edu/rha';
-var connectionStringRDS = "postgres://username:temppass@rha-db.cvv5ctfyazxp.us-west-2.rds.amazonaws.com:3000/rha";
-connectionString = connectionStringRDS;
+var connectionString = "postgres://username:temppass@rha-db.cvv5ctfyazxp.us-west-2.rds.amazonaws.com:3000/rha";
+var connectionStringRDS = connectionString;
 var bodyParser = require('body-parser');
 var urlencodedParser = bodyParser.urlencoded({ extended: false });
 
