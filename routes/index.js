@@ -5,6 +5,8 @@ var path = require('path');
 var connectionString = process.env.DATABASE_URL || 'postgres://postgres:rhasite@rha-website-0.csse.rose-hulman.edu/rha'
 var bodyParser = require('body-parser');
 var urlencodedParser = bodyParser.urlencoded({ extended: false });
+var multer = require('multer');
+var upload = multer();
 
 /*---------------------------- Events Endpoints ------------------------------*/
 
@@ -241,6 +243,50 @@ router.get('/api/v1/members', (req, res, next) => {
     }
 
     const query = client.query('SELECT * FROM members ORDER BY hall ASC, lastname ASC;');
+
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
+/* POST multiple members */
+router.post('/api/v1/members', (req, res, next) => {
+  const results = [];
+
+  var membersToAdd = req.body.membersToAdd;
+
+  pg.connect(connectionString, (err, client, done) => {
+
+    console.log(req.file);
+
+    if (err) {
+      done();
+      console.log(err);
+      return res.status(500).json({ success: false, data: err });
+    }
+
+    membersToAdd.forEach(function (e) {
+      var postMember = "INSERT INTO members (username) VALUES ($1)";
+      var username;
+        //have a better check here in case the usernames are empty
+        if (e.username == membersToAdd[0]) {
+          username = e.username;
+          if (membersToAdd.length == 1) {
+            membersToAdd = [];
+          } else {
+            membersToAdd.splice(0, 1);
+          }
+        }
+        client.query(postMember, [username])
+    });
+
+    const query = client.query('SELECT * FROM members;');
 
     query.on('row', (row) => {
       results.push(row);
@@ -570,7 +616,6 @@ router.delete('/api/v1/committee/:id', (req, res, next) => {
 });
 
 /*---------------------------- Funds Endpoints ------------------------------*/
-
 
 /* GET all funds */
 router.get('/api/v1/funds', (req, res, next) => {
