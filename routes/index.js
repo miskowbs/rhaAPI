@@ -5,8 +5,6 @@ var path = require('path');
 var connectionString = "postgres://username:temppass@rha-db.cvv5ctfyazxp.us-west-2.rds.amazonaws.com:3000/rha";
 var bodyParser = require('body-parser');
 var urlencodedParser = bodyParser.urlencoded({ extended: false });
-var multer = require('multer');
-var upload = multer();
 
 /*---------------------------- Events Endpoints ------------------------------*/
 
