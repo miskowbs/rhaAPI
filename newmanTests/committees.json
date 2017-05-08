@@ -1,0 +1,347 @@
+{
+	"variables": [],
+	"info": {
+		"name": "RHAwebsiteCommittee",
+		"_postman_id": "d4fafa4f-33bb-787b-9852-93f80891922b",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "01 - initial get",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"",
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"var hasId = false;",
+							"var count = 0;",
+							"var targetId = postman.getEnvironmentVariable(\"committeeid\");",
+							"var jsonData = JSON.parse(responseBody);",
+							"for (var committee in jsonData) {",
+							"    count++;",
+							"    if (committee.committeeid == targetId) {",
+							"        hasId = true;",
+							"    }",
+							"}",
+							"",
+							"postman.setEnvironmentVariable(\"number_of_committees\", count);",
+							"",
+							"tests[\"Should not Contain committee yet\"] = !hasId;",
+							"",
+							"tests[\"Response time is less than 200ms\"] = responseTime < 200;",
+							"",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "{{api}}/committees",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "text/plain",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"proposer\": \"onattt\",\n    \"proposal_name\": \"Movie on Speed Lawn\",\n    \"week_proposed\": 2,\n    \"quarter_proposed\": 2,\n    \"money_requested\": 100,\n    \"money_allocated\": 100,\n    \"event_date\": \"2017-07-10T05:00:00.000Z\",\n    \"event_signup_open\": \"2017-02-07T05:00:00.000Z\",\n    \"event_signup_close\": \"2017-02-07T05:00:00.000Z\",\n    \"cost_to_attendee\": 0,\n    \"description\": \"We will watch the new Spider Man movie on Speed Lawn.\"\n  }"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "02 - bad post",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"",
+							"tests[\"Status code is 400\"] = responseCode.code === 400;",
+							"",
+							"",
+							"tests[\"Response time is less than 200ms\"] = responseTime < 200;",
+							"",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "{{api}}/committee",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"apondwpo\": \"poadj\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "03 - verify bad post failed",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"",
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"var hasId = false;",
+							"var targetId = postman.getEnvironmentVariable(\"committeeid\");",
+							"var jsonData = JSON.parse(responseBody);",
+							"for (var committee in jsonData) {",
+							"    if (committee.committeeid == targetId) {",
+							"        hasId = true;",
+							"    }",
+							"}",
+							"",
+							"var numb_committees = postman.getEnvironmentVariable(\"number_of_committees\");",
+							"tests[\"no committees added\"] = jsonData.length+\"\" === numb_committees;",
+							"",
+							"tests[\"Should not Contain committee yet\"] = !hasId;",
+							"",
+							"tests[\"Response time is less than 200ms\"] = responseTime < 200;",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "{{api}}/committees",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "04 - post new committee",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"var committee = JSON.parse(responseBody)[0];",
+							"for (var field in committee) {",
+							"    postman.setEnvironmentVariable(field, committee[field]);",
+							"}",
+							"",
+							"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "{{api}}/committee",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"committeeName\": \"Test-Comittee\",\n    \"description\": \"test\",\n    \"image\": \"test-dir\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "05 - verify post",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"var jsonData = JSON.parse(responseBody);",
+							"var targetId = postman.getEnvironmentVariable(\"committeeid\");",
+							"var hasId = false;",
+							"var committee = {};",
+							"jsonData.forEach(function(c) {",
+							"    if (c.committeeid+\"\" === targetId) {",
+							"        committee = c;",
+							"        hasId = true;",
+							"    }",
+							"});",
+							"",
+							"tests[\"has id \" + targetId] = hasId;",
+							"",
+							"for (var field in committee) {",
+							"    var val = postman.getEnvironmentVariable(field);",
+							"    tests[field + \" field correct\"] = val === \"\"+committee[field];",
+							"}",
+							"",
+							"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "{{api}}/committees",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "06 - committee put",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"var committee = JSON.parse(responseBody)[0];",
+							"for (var field in committee) {",
+							"    postman.setEnvironmentVariable(field, committee[field]);",
+							"}",
+							"",
+							"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "{{api}}/committee/{{committeeid}}",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"committeeName\": \"Test-Comittee-EDIT\",\n    \"description\": \"test-EDIT\",\n    \"image\": \"something-else\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "07 - verify put",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"var jsonData = JSON.parse(responseBody);",
+							"var targetId = postman.getEnvironmentVariable(\"committeeid\");",
+							"var hasId = false;",
+							"var committee = {};",
+							"jsonData.forEach(function(c) {",
+							"    if (c.committeeid+\"\" === targetId) {",
+							"        committee = c;",
+							"        hasId = true;",
+							"    }",
+							"});",
+							"",
+							"tests[\"has id \" + targetId] = hasId;",
+							"",
+							"for (var field in committee) {",
+							"    var val = postman.getEnvironmentVariable(field);",
+							"    tests[field + \" field correct\"] = val === \"\"+committee[field];",
+							"}",
+							"",
+							"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "{{api}}/committees",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "08 - cleanup committee",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "{{api}}/committee/{{committeeid}}",
+				"method": "DELETE",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "09 - can't delete nonexistant",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"// tests[\"Status code is 404\"] = responseCode.code === 404;",
+							"",
+							"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "{{api}}/committee/{{committeeid}}",
+				"method": "DELETE",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}

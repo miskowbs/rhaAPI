@@ -1,0 +1,256 @@
+{
+  "id": "5048eebd-4e4f-dffe-8d9b-c947a0005d53",
+  "name": "RHA-website",
+  "values": [
+    {
+      "enabled": true,
+      "key": "site",
+      "type": "text",
+      "value": "127.0.0.1:8000"
+    },
+    {
+      "enabled": true,
+      "key": "api",
+      "type": "text",
+      "value": "127.0.0.1:3000/api/v1"
+    },
+    {
+      "enabled": true,
+      "key": "proposal_id",
+      "type": "text",
+      "value": "31"
+    },
+    {
+      "enabled": true,
+      "key": "proposer",
+      "type": "text",
+      "value": "bonattt"
+    },
+    {
+      "enabled": true,
+      "key": "proposal_name",
+      "type": "text",
+      "value": "TEST EVENT"
+    },
+    {
+      "enabled": true,
+      "key": "week_proposed",
+      "type": "text",
+      "value": "2"
+    },
+    {
+      "enabled": true,
+      "key": "quarter_proposed",
+      "type": "text",
+      "value": "1"
+    },
+    {
+      "enabled": true,
+      "key": "money_requested",
+      "type": "text",
+      "value": "3"
+    },
+    {
+      "enabled": true,
+      "key": "approved",
+      "type": "text",
+      "value": "true"
+    },
+    {
+      "enabled": true,
+      "key": "money_allocated",
+      "type": "text",
+      "value": "4"
+    },
+    {
+      "enabled": true,
+      "key": "paid",
+      "type": "text",
+      "value": "false"
+    },
+    {
+      "enabled": true,
+      "key": "proposed_date",
+      "type": "text",
+      "value": "2016-01-02T05:00:00.000Z"
+    },
+    {
+      "enabled": true,
+      "key": "event_date",
+      "type": "text",
+      "value": "2017-01-02T05:00:00.000Z"
+    },
+    {
+      "enabled": true,
+      "key": "event_signup_open",
+      "type": "text",
+      "value": "2017-02-02T05:00:00.000Z"
+    },
+    {
+      "enabled": true,
+      "key": "event_signup_close",
+      "type": "text",
+      "value": "2017-03-02T05:00:00.000Z"
+    },
+    {
+      "enabled": true,
+      "key": "cost_to_attendee",
+      "type": "text",
+      "value": "0"
+    },
+    {
+      "enabled": true,
+      "key": "image_path",
+      "type": "text",
+      "value": "image_path"
+    },
+    {
+      "enabled": true,
+      "key": "description",
+      "type": "text",
+      "value": "test-EDIT"
+    },
+    {
+      "enabled": true,
+      "key": "attendees",
+      "type": "text",
+      "value": ""
+    },
+    {
+      "enabled": true,
+      "key": "desiredResponseTime",
+      "type": "text",
+      "value": "200"
+    },
+    {
+      "enabled": true,
+      "key": "event_id",
+      "type": "text",
+      "value": "999999"
+    },
+    {
+      "enabled": true,
+      "key": "member_id",
+      "type": "text",
+      "value": "999999"
+    },
+    {
+      "enabled": true,
+      "key": "username",
+      "type": "text",
+      "value": "_test_"
+    },
+    {
+      "enabled": true,
+      "key": "user_id",
+      "type": "text",
+      "value": "318"
+    },
+    {
+      "enabled": true,
+      "key": "firstname",
+      "type": "text",
+      "value": "Not Test"
+    },
+    {
+      "enabled": true,
+      "key": "lastname",
+      "type": "text",
+      "value": "Different Name"
+    },
+    {
+      "enabled": true,
+      "key": "hall",
+      "type": "text",
+      "value": "Apartments W 2"
+    },
+    {
+      "enabled": true,
+      "key": "image",
+      "type": "text",
+      "value": "not null"
+    },
+    {
+      "enabled": true,
+      "key": "membertype",
+      "type": "text",
+      "value": "some member"
+    },
+    {
+      "enabled": true,
+      "key": "active",
+      "type": "text",
+      "value": ""
+    },
+    {
+      "enabled": true,
+      "key": "trip_eligible",
+      "type": "text",
+      "value": ""
+    },
+    {
+      "enabled": true,
+      "key": "meet_attend",
+      "type": "text",
+      "value": "{\"Q1\":[0],\"Q2\":[1],\"Q3\":[]}"
+    },
+    {
+      "enabled": true,
+      "key": "cm",
+      "type": "text",
+      "value": "9999"
+    },
+    {
+      "enabled": true,
+      "key": "phone_number",
+      "type": "text",
+      "value": "987654321"
+    },
+    {
+      "enabled": true,
+      "key": "room_number",
+      "type": "text",
+      "value": "1111"
+    },
+    {
+      "enabled": true,
+      "key": "numActiveMembers",
+      "type": "text",
+      "value": "0"
+    },
+    {
+      "enabled": true,
+      "key": "committeeid",
+      "type": "text",
+      "value": "46"
+    },
+    {
+      "enabled": true,
+      "key": "number_of_committees",
+      "type": "text",
+      "value": "2"
+    },
+    {
+      "enabled": true,
+      "key": "committeename",
+      "type": "text",
+      "value": "Test-Comittee-EDIT"
+    },
+    {
+      "enabled": true,
+      "key": "expenses_id",
+      "type": "text",
+      "value": "9999999"
+    },
+    {
+      "enabled": true,
+      "key": "numb_payments",
+      "type": "text",
+      "value": "8"
+    }
+  ],
+  "timestamp": 1489603853149,
+  "_postman_variable_scope": "environment",
+  "_postman_exported_at": "2017-03-15T19:02:19.160Z",
+  "_postman_exported_using": "Postman/4.10.3"
+}

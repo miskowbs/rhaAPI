@@ -1,0 +1,338 @@
+{
+	"variables": [],
+	"info": {
+		"name": "RHAwebsiteGET",
+		"_postman_id": "9ae9db2d-e4be-5313-c6f8-2f110632c80f",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "GET: events",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"",
+							"var jsonData = JSON.parse(responseBody);",
+							"var firstEntry = jsonData[0];",
+							"",
+							"tests[\"response has proposal_id field\"] = jsonData.proposal_id != \"undefined\";",
+							"tests[\"response has proposal_name field\"] = jsonData.proposal_name != \"undefined\";",
+							"tests[\"response has event_date field\"] = jsonData.event_data != \"undefined\";",
+							"tests[\"response has event_signup_close field\"] = jsonData.event_signup_close != \"undefined\";",
+							"tests[\"response has event_signup_open field\"] = jsonData.event_signup_open != \"undefined\";",
+							"tests[\"response has cost_to_attendee field\"] = jsonData.cost_to_attendee != \"undefined\";",
+							"tests[\"response has image_path field\"] = jsonData.image_path != \"undefined\";",
+							"tests[\"response has description field\"] = jsonData.attendees != \"undefined\";",
+							"",
+							"",
+							"tests[\"Response time is ok\"] = responseTime < parseInt(postman.getEnvironmentVariable(\"desiredResponseTime\"));",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "{{api}}/events",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "GET: allEvents",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"",
+							"var jsonData = JSON.parse(responseBody);",
+							"var firstEntry = jsonData[0];",
+							"",
+							"tests[\"response has proposal_id field\"] = jsonData.proposal_id != \"undefined\";",
+							"tests[\"response has proposer field\"] = jsonData.proposer != \"undefined\";",
+							"tests[\"response has proposal_name field\"] = jsonData.proposal_name != \"undefined\";",
+							"tests[\"response has week_proposed field\"] = jsonData.week_proposed != \"undefined\";",
+							"tests[\"response has quarter_proposed field\"] = jsonData.quarter_proposed != \"undefined\";",
+							"tests[\"response has money_requested field\"] = jsonData.money_requested != \"undefined\";",
+							"tests[\"response has approved field\"] = jsonData.approved != \"undefined\";",
+							"tests[\"response has money_allocated field\"] = jsonData.money_allocated != \"undefined\";",
+							"tests[\"response has paid field\"] = jsonData.paid != \"undefined\";",
+							"tests[\"response has proposed_date field\"] = jsonData.proposed_date != \"undefined\";",
+							"tests[\"response has event_date field\"] = jsonData.event_data != \"undefined\";",
+							"tests[\"response has event_signup_close field\"] = jsonData.event_signup_close != \"undefined\";",
+							"tests[\"response has event_signup_open field\"] = jsonData.event_signup_open != \"undefined\";",
+							"tests[\"response has cost_to_attendee field\"] = jsonData.cost_to_attendee != \"undefined\";",
+							"tests[\"response has image_path field\"] = jsonData.image_path != \"undefined\";",
+							"tests[\"response has description field\"] = jsonData.attendees != \"undefined\";",
+							"",
+							"",
+							"tests[\"Response time is ok\"] = responseTime < parseInt(postman.getEnvironmentVariable(\"desiredResponseTime\"));",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "{{api}}/allEvents",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "GET: pastEvents",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"",
+							"var jsonData = JSON.parse(responseBody);",
+							"var firstEntry = jsonData[0];",
+							"",
+							"",
+							"",
+							"",
+							"tests[\"Response time is ok\"] = responseTime < parseInt(postman.getEnvironmentVariable(\"desiredResponseTime\"));",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "{{api}}/pastEvents",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "GET: events/:id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"",
+							"var jsonData = JSON.parse(responseBody);",
+							"var firstEntry = jsonData[0];",
+							"tests[\"gets requested ID\"] = firstEntry.proposal_id === 2",
+							"",
+							"",
+							"tests[\"Response time is ok\"] = responseTime < parseInt(postman.getEnvironmentVariable(\"desiredResponseTime\"));",
+							"",
+							"",
+							"/*{",
+							"    \"proposal_id\": 2,",
+							"    \"proposer\": \"Morgan\",",
+							"    \"proposal_name\": \"Tropical Sno\",",
+							"    \"week_proposed\": 3,",
+							"    \"quarter_proposed\": 2,",
+							"    \"money_requested\": 75,",
+							"    \"approved\": true,",
+							"    \"money_allocated\": 75,",
+							"    \"paid\": true,",
+							"    \"proposed_date\": \"2017-01-02T05:00:00.000Z\",",
+							"    \"event_date\": \"2017-01-02T05:00:00.000Z\",",
+							"    \"event_signup_open\": \"2017-02-11T05:00:00.000Z\",",
+							"    \"event_signup_close\": \"2017-05-02T05:00:00.000Z\",",
+							"    \"cost_to_attendee\": 0,",
+							"    \"image_path\": \"../images/events/troSno.jpeg\",",
+							"    \"description\": \"Come get snowcones and enjoy the company!\",",
+							"    \"attendees\": [",
+							"      \"miskowbs\"",
+							"    ]",
+							"  },*/"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "{{api}}/events/2",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "GET: members",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"tests[\"Response time is ok\"] = responseTime < ",
+							"        parseInt(postman.getEnvironmentVariable(\"desiredResponseTime\"));",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "{{api}}/members",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "GET: officers",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"var desiredResponseTime = parseInt(postman.getEnvironmentVariable(\"desiredResponseTime\"));",
+							"tests[\"Response time is ok\"] = responseTime < desiredResponseTime;",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "{{api}}/officers",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "GET: activeMembers",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"var desiredResponseTime = parseInt(postman.getEnvironmentVariable(\"desiredResponseTime\"));",
+							"tests[\"Response time is ok\"] = responseTime < desiredResponseTime;",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "{{api}}/activeMemebers",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "GET: committees",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"var desiredResponseTime = parseInt(postman.getEnvironmentVariable(\"desiredResponseTime\"));",
+							"tests[\"Response time is ok\"] = responseTime < desiredResponseTime;",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "{{api}}/committees",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "GET: funds",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"var desiredResponseTime = parseInt(postman.getEnvironmentVariable(\"desiredResponseTime\"));",
+							"tests[\"Response time is ok\"] = responseTime < desiredResponseTime;",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "{{api}}/funds",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "GET: payments",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"var desiredResponseTime = parseInt(postman.getEnvironmentVariable(\"desiredResponseTime\"));",
+							"tests[\"Response time is ok\"] = responseTime < desiredResponseTime;",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "{{api}}/payments",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}
