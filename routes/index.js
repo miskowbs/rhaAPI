@@ -1,12 +1,18 @@
 var express = require('express');
-var router = express.Router();
+var router = express.Router();  
+// var https = express.createServer();
 var pg = require('pg');
 var path = require('path');
-var connectionString = process.env.DATABASE_URL || 'postgres://postgres:rhasite@rha-website-0.csse.rose-hulman.edu/rha'
+var connectionString = "postgres://username:temppass@rha-db.cvv5ctfyazxp.us-west-2.rds.amazonaws.com:3000/rha";
+var connectionStringRDS = connectionString;
 var bodyParser = require('body-parser');
 var urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 /*---------------------------- Events Endpoints ------------------------------*/
+
+// https.get('*', (req, res) => {
+//   res.redirect(connectionString + req.url);
+// }).listen(8080);
 
 
 /* GET active events */
@@ -457,7 +463,7 @@ router.delete('/api/v1/member/:id', (req, res, next) => {
 router.get('/api/v1/committees', (req, res, next) => {
   const results = [];
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionStringRDS, (err, client, done) => {
     if (err) {
       done();
       console;
@@ -488,7 +494,7 @@ router.post('/api/v1/committee', (req, res, next) => {
     return res.status(400).json({ success: false, data: "This is not properly formed committee." });
   }
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionStringRDS, (err, client, done) => {
 
     if (err) {
       done();
@@ -518,7 +524,7 @@ router.put('/api/v1/committee/:id', (req, res, next) => {
 
   const id = req.params.id;
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionStringRDS, (err, client, done) => {
     if (err) {
       done();
       console.log(err);
@@ -553,7 +559,7 @@ router.delete('/api/v1/committee/:id', (req, res, next) => {
 
   const id = req.params.id;
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionStringRDS, (err, client, done) => {
     if (err) {
       done();
       console.log(err);
@@ -576,7 +582,7 @@ router.delete('/api/v1/committee/:id', (req, res, next) => {
 router.get('/api/v1/funds', (req, res, next) => {
   const results = [];
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionStringRDS, (err, client, done) => {
     if (err) {
       done();
       console;
@@ -601,7 +607,7 @@ router.get('/api/v1/funds', (req, res, next) => {
 router.get('/api/v1/floorMoney', (req, res, next) => {
   const results = [];
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionStringRDS, (err, client, done) => {
     if (err) {
       done();
       console;
@@ -628,7 +634,7 @@ router.put('/api/v1/fund/:id', (req, res, next) => {
 
   const id = req.params.id;
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionStringRDS, (err, client, done) => {
     if (err) {
       done();
       console.log(err);
@@ -893,24 +899,14 @@ router.get('/api/v1/attendance/undo', (req, res, next) => {
       return res.status(500).json({ success: false, data: err });
     }
 
-    var query1 = client.query("COPY Rentals TO '/tmp/rentalsBackup.csv' DELIMITER ',' CSV HEADER;");
     var query2 = client.query("TRUNCATE Members CASCADE;");
     var query3 = client.query("COPY Members FROM '/tmp/membersBackup.csv' DELIMITER ',' CSV HEADER;");
-    var query4 = client.query("COPY Rentals FROM '/tmp/rentalsBackup.csv' DELIMITER ',' CSV HEADER;");
-
-    query1.on('end', () => {
-      done();
-    });
 
     query2.on('end', () => {
       done();
     });
 
     query3.on('end', () => {
-      done();
-    });
-
-    query4.on('end', () => {
       done();
       return res.json(results);
     });
@@ -1376,7 +1372,7 @@ router.post('/api/v1/equipment', (req, res, next) => {
 
   const data = { equipmentName: req.body.equipmentName, equipmentEmbed: req.body.equipmentEmbed };
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionStringRDS, (err, client, done) => {
 
     if (err) {
       done();
@@ -1412,7 +1408,7 @@ router.delete('/api/v1/equipment/:id', (req, res, next) => {
 
   const id = req.params.id;
 
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionStringRDS, (err, client, done) => {
     if (err) {
       done();
       console.log(err);
@@ -1441,7 +1437,7 @@ router.delete('/api/v1/equipment/:id', (req, res, next) => {
 /* GET all equipment data */
 router.get('/api/v1/equipment', (req, res, next) => {
   const results = [];
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(connectionStringRDS, (err, client, done) => {
     if (err) {
       done();
       console.log(err);
