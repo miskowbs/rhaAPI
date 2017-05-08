@@ -271,16 +271,13 @@ router.post('/api/v1/members', (req, res, next) => {
     }
 
     membersToAdd.forEach(function (e) {
-      var postMember = "INSERT INTO members (username) VALUES ($1)";
-      var username;
-        //have a better check here in case the usernames are empty
-        if (e.username == membersToAdd[0]) {
-          username = e.username;
-          if (membersToAdd.length == 1) {
-            membersToAdd = [];
-          } else {
-            membersToAdd.splice(0, 1);
-          }
+      var postMember = "INSERT INTO members (username, meet_attend) VALUES ($1, {'Q1': [], 'Q2': [], 'Q3': []})";
+      var username = e.username;
+      //Maybe check if member name already exists? (GET statement stored as variable, usernames only)
+        if (membersToAdd.length == 1) {
+          membersToAdd = [];
+        } else {
+          membersToAdd.splice(0, 1);
         }
         client.query(postMember, [username])
     });
