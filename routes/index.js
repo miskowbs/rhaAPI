@@ -283,7 +283,7 @@ router.post('/api/v1/members', (req, res, next) => {
         } else {
           membersToAdd.splice(0, 1);
         }
-        console.log("INSERT INTO members (username, meet_attend, active, trip_eligible) VALUES ({0}, \'{\"Q1\": [], \:Q2\": [], \"Q3\": []}\', FALSE, FALSE)");
+        console.log(postMember);
         client.query(postMember, [username])
     });
 
