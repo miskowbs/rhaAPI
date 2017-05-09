@@ -262,13 +262,15 @@ router.post('/api/v1/members', (req, res, next) => {
 
   pg.connect(connectionString, (err, client, done) => {
 
-    console.log(req.file);
-
     if (err) {
       done();
       console.log("Error?");
       console.log(err);
       return res.status(500).json({ success: false, data: err });
+    }
+
+    for member in membersToAdd {
+      console.log(member);
     }
 
     membersToAdd.forEach(function (e) {
