@@ -269,9 +269,9 @@ router.post('/api/v1/members', (req, res, next) => {
       return res.status(500).json({ success: false, data: err });
     }
 
-    for member in membersToAdd {
-      console.log(member);
-    }
+    for (var i = 0; i < membersToAdd.length; i++) {
+      console.log(membersToAdd[i]);
+    };
 
     membersToAdd.forEach(function (e) {
       var postMember = "INSERT INTO members (username, meet_attend, active, trip_eligible) VALUES ($1, \'{'Q1': [], 'Q2': [], 'Q3': []}\', FALSE, FALSE)";
