@@ -274,7 +274,7 @@ router.post('/api/v1/members', (req, res, next) => {
     };
 
     membersToAdd.forEach(function (e) {
-      var postMember = "INSERT INTO members (username, meet_attend, active, trip_eligible) VALUES ($1, \'{'Q1': [], 'Q2': [], 'Q3': []}\', FALSE, FALSE)";
+      var postMember = "INSERT INTO members (username, meet_attend, active, trip_eligible) VALUES ($1, \'{\"Q1\": [], \:Q2\": [], \"Q3\": []}\', FALSE, FALSE)";
       var username = e.username;
       console.log(username);
       //Maybe check if member name already exists? (GET statement stored as variable, usernames only)
@@ -283,7 +283,7 @@ router.post('/api/v1/members', (req, res, next) => {
         } else {
           membersToAdd.splice(0, 1);
         }
-        console.log("INSERT INTO members (username, meet_attend, active, trip_eligible) VALUES ({0}, \'{'Q1': [], 'Q2': [], 'Q3': []}\', FALSE, FALSE)");
+        console.log("INSERT INTO members (username, meet_attend, active, trip_eligible) VALUES ({0}, \'{\"Q1\": [], \:Q2\": [], \"Q3\": []}\', FALSE, FALSE)");
         client.query(postMember, [username])
     });
 
