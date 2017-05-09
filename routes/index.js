@@ -269,14 +269,9 @@ router.post('/api/v1/members', (req, res, next) => {
       return res.status(500).json({ success: false, data: err });
     }
 
-    for (var i = 0; i < membersToAdd.length; i++) {
-      console.log(membersToAdd[i]);
-    };
-
     membersToAdd.forEach(function (e) {
       var postMember = "INSERT INTO members (username, meet_attend, active, trip_eligible) VALUES ($1, \'{\"Q1\": [], \"Q2\": [], \"Q3\": []}\', FALSE, FALSE);";
-      var username = e.username;
-      console.log("OWHAASDFH");
+      var username = e;
       console.log(typeof username);
       //Maybe check if member name already exists? (GET statement stored as variable, usernames only)
         if (membersToAdd.length == 1) {
