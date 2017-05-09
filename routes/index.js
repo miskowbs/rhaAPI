@@ -270,7 +270,7 @@ router.post('/api/v1/members', (req, res, next) => {
     }
 
     membersToAdd.forEach(function (e) {
-      var postMember = "INSERT INTO members (username, meet_attend, active, trip_eligible) VALUES ($1, \'{\"Q1\": [], \"Q2\": [], \"Q3\": []}\', FALSE, FALSE);";
+      var postMember = "INSERT INTO members (username, hall, active, trip_eligible) VALUES ($1, 'not null', FALSE, FALSE);"; //'not null', replace with $2 and a hall from membersToAdd
       var username = e;
       console.log(typeof username);
       //Maybe check if member name already exists? (GET statement stored as variable, usernames only)
@@ -390,14 +390,10 @@ router.put('/api/v1/member/:id', (req, res, next) => {
 });
 
 /* POST new officer (into Members) */
-router.post('/api/v1/officer', (req, res, next) => {
+router.post('/api/v1/singleMember', (req, res, next) => {
   const results = [];
 
-  const data = { username: req.body.username, firstname: req.body.firstname, lastname: req.body.lastname, hall: req.body.hall, image: req.body.image, memberType: req.body.memberType, CM: req.body.CM, phoneNumber: req.body.phoneNumber, roomNumber: req.body.roomNumber };
-
-  if (data.username == null || data.firstname == null || data.lastname == null || data.hall == null || data.image == null || data.CM == null || data.phoneNumber == null || data.roomNumber == null) {
-    return res.status(400).json({ success: false, data: "This is not a properly formed officer." });
-  }
+  var data = req.body;
 
   pg.connect(connectionString, (err, client, done) => {
 
@@ -407,8 +403,7 @@ router.post('/api/v1/officer', (req, res, next) => {
       return res.status(500).json({ success: false, data: err });
     }
 
-    client.query('INSERT INTO members(username, firstname, lastname, hall, image, memberType,CM, phone_number, room_number) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9);',
-      [data.username, data.firstname, data.lastname, data.hall, data.image, data.memberType, data.CM, data.phoneNumber, data.roomNumber]);
+    client.query("INSERT INTO Members (username, firstname, lastname) VALUES ($1, $2, $3);", [data.username, data.firstname, data.lastname]);
 
     const query = client.query('SELECT * FROM members WHERE username = $1', [data.username]);
 
