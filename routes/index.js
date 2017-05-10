@@ -280,7 +280,7 @@ router.post('/api/v1/members', (req, res, next) => {
           membersToAdd.splice(0, 1);
         }
         console.log(postMember);
-        client.query(postMember, [username])
+        client.query(postMember, [username, hall])
     });
 
     const query = client.query('SELECT * FROM members;');
