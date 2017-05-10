@@ -270,6 +270,7 @@ router.post('/api/v1/members', (req, res, next) => {
 
     membersToAdd.forEach(function (e) {
       var postMember = "INSERT INTO members (username, hall, active, trip_eligible) VALUES ($1, $2, FALSE, FALSE);"; //'not null', replace with $2 and a hall from membersToAdd
+      console.log(e);
       var username = e.username;
       var hall = e.hall;
       console.log(typeof username);
