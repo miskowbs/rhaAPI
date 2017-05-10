@@ -258,7 +258,6 @@ router.post('/api/v1/members', (req, res, next) => {
   const results = [];
 
   var membersToAdd = req.body.membersToAdd;
-  console.log(membersToAdd);
 
   pg.connect(connectionString, (err, client, done) => {
 
@@ -270,8 +269,9 @@ router.post('/api/v1/members', (req, res, next) => {
     }
 
     membersToAdd.forEach(function (e) {
-      var postMember = "INSERT INTO members (username, hall, active, trip_eligible) VALUES ($1, 'not null', FALSE, FALSE);"; //'not null', replace with $2 and a hall from membersToAdd
-      var username = e;
+      var postMember = "INSERT INTO members (username, hall, active, trip_eligible) VALUES ($1, $2, FALSE, FALSE);"; //'not null', replace with $2 and a hall from membersToAdd
+      var username = e.username;
+      var hall = e.hall;
       console.log(typeof username);
       //Maybe check if member name already exists? (GET statement stored as variable, usernames only)
         if (membersToAdd.length == 1) {
