@@ -258,7 +258,6 @@ router.post('/api/v1/members', (req, res, next) => {
   const results = [];
 
   var membersToAdd = req.body.membersToAdd;
-  console.log(membersToAdd);
 
   pg.connect(connectionString, (err, client, done) => {
 
