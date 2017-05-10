@@ -263,14 +263,12 @@ router.post('/api/v1/members', (req, res, next) => {
 
     if (err) {
       done();
-      console.log("Error?");
       console.log(err);
       return res.status(500).json({ success: false, data: err });
     }
 
     membersToAdd.forEach(function (e) {
       var postMember = "INSERT INTO members (username, hall, active, trip_eligible) VALUES ($1, $2, FALSE, FALSE);"; //'not null', replace with $2 and a hall from membersToAdd
-      console.log(e);
       var split = e.split(',');
       var username = split[0];
       var hall = split[1];
@@ -280,7 +278,6 @@ router.post('/api/v1/members', (req, res, next) => {
         } else {
           membersToAdd.splice(0, 1);
         }
-        console.log(postMember);
         client.query(postMember, [username, hall])
     });
 
