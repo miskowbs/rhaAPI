@@ -273,12 +273,7 @@ router.post('/api/v1/members', (req, res, next) => {
       var username = e.username;
       var hall = e.hall;
       //Maybe check if member name already exists? (GET statement stored as variable, usernames only)
-        if (membersToAdd.length == 1) {
-          membersToAdd = [];
-        } else {
-          membersToAdd.splice(0, 1);
-        }
-        client.query(postMember, [username, hall])
+      client.query(postMember, [username, hall])
     });
 
     const query = client.query('SELECT * FROM members;');
