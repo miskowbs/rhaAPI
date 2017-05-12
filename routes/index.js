@@ -929,10 +929,6 @@ router.put('/api/v1/attendance/:quarter', urlencodedParser, (req, res, next) => 
 
     var query = client.query("SELECT username, meet_attend from members ORDER BY username ASC;");
 
-    backup.on('end', () => {
-      done(); //For catching errors if copy statement is wrong
-    });
-
     query.on('row', (row) => {
       results.push(row);
       nameAndAttendance.push({ username: row.username, meet_attend: row.meet_attend });
