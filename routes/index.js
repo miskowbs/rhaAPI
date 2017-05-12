@@ -918,6 +918,7 @@ router.put('/api/v1/attendance/:quarter', urlencodedParser, (req, res, next) => 
   var quarter = req.params.quarter;
 
   var sortedUsernames = req.body.membersToUpdate;
+  console.log(sortedUsernames);
   pg.connect(connectionString, (err, client, done) => {
     if (err) {
       done();
@@ -940,6 +941,7 @@ router.put('/api/v1/attendance/:quarter', urlencodedParser, (req, res, next) => 
     query.on('end', () => {
       done();
       nameAndAttendance.forEach(function (e) {
+        console.log(e);
         var insertAttendance = "UPDATE members SET meet_attend = $1 WHERE username = $2;";
         var present = 0;
         var newAttendance = e.meet_attend;
