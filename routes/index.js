@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 var pg = require('pg');
 var path = require('path');
-var connectionString = process.env.DATABASE_URL || 'postgres://postgres:rhasite@rha-website-0.csse.rose-hulman.edu/rha'
+var connectionString = "postgres://username:temppass@rha-db.cvv5ctfyazxp.us-west-2.rds.amazonaws.com:3000/rha";
 var bodyParser = require('body-parser');
 var urlencodedParser = bodyParser.urlencoded({ extended: false });
 
@@ -253,6 +253,41 @@ router.get('/api/v1/members', (req, res, next) => {
   });
 });
 
+/* POST multiple members */
+router.post('/api/v1/members', (req, res, next) => {
+  const results = [];
+
+  var membersToAdd = req.body.membersToAdd;
+
+  pg.connect(connectionString, (err, client, done) => {
+
+    if (err) {
+      done();
+      console.log(err);
+      return res.status(500).json({ success: false, data: err });
+    }
+
+    membersToAdd.forEach(function (e) {
+      var postMember = "INSERT INTO members (username, hall, active, trip_eligible) VALUES ($1, $2, FALSE, FALSE);"; //'not null', replace with $2 and a hall from membersToAdd
+      var username = e.username;
+      var hall = e.hall;
+      //Maybe check if member name already exists? (GET statement stored as variable, usernames only)
+      client.query(postMember, [username, hall])
+    });
+
+    const query = client.query('SELECT * FROM members;');
+
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
 /* PUT Member */
 router.put('/api/v1/members/:username', (req, res, next) => {
   const results = [];
@@ -347,14 +382,10 @@ router.put('/api/v1/member/:id', (req, res, next) => {
 });
 
 /* POST new officer (into Members) */
-router.post('/api/v1/officer', (req, res, next) => {
+router.post('/api/v1/singleMember', (req, res, next) => {
   const results = [];
 
-  const data = { username: req.body.username, firstname: req.body.firstname, lastname: req.body.lastname, hall: req.body.hall, image: req.body.image, memberType: req.body.memberType, CM: req.body.CM, phoneNumber: req.body.phoneNumber, roomNumber: req.body.roomNumber };
-
-  if (data.username == null || data.firstname == null || data.lastname == null || data.hall == null || data.image == null || data.CM == null || data.phoneNumber == null || data.roomNumber == null) {
-    return res.status(400).json({ success: false, data: "This is not a properly formed officer." });
-  }
+  var data = req.body;
 
   pg.connect(connectionString, (err, client, done) => {
 
@@ -364,8 +395,7 @@ router.post('/api/v1/officer', (req, res, next) => {
       return res.status(500).json({ success: false, data: err });
     }
 
-    client.query('INSERT INTO members(username, firstname, lastname, hall, image, memberType,CM, phone_number, room_number) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9);',
-      [data.username, data.firstname, data.lastname, data.hall, data.image, data.memberType, data.CM, data.phoneNumber, data.roomNumber]);
+    client.query("INSERT INTO Members (username, firstname, lastname) VALUES ($1, $2, $3);", [data.username, data.firstname, data.lastname]);
 
     const query = client.query('SELECT * FROM members WHERE username = $1', [data.username]);
 
@@ -570,7 +600,6 @@ router.delete('/api/v1/committee/:id', (req, res, next) => {
 });
 
 /*---------------------------- Funds Endpoints ------------------------------*/
-
 
 /* GET all funds */
 router.get('/api/v1/funds', (req, res, next) => {
@@ -883,40 +912,6 @@ router.post('/api/v1/proposal', urlencodedParser, function (req, res, next) {
 
 /*---------------------------- Attendance Endpoints ------------------------------*/
 
-router.get('/api/v1/attendance/undo', (req, res, next) => {
-  const results = "It worked!";
-
-  pg.connect(connectionString, (err, client, done) => {
-    if (err) {
-      done();
-      console.log(err);
-      return res.status(500).json({ success: false, data: err });
-    }
-
-    var query1 = client.query("COPY Rentals TO '/tmp/rentalsBackup.csv' DELIMITER ',' CSV HEADER;");
-    var query2 = client.query("TRUNCATE Members CASCADE;");
-    var query3 = client.query("COPY Members FROM '/tmp/membersBackup.csv' DELIMITER ',' CSV HEADER;");
-    var query4 = client.query("COPY Rentals FROM '/tmp/rentalsBackup.csv' DELIMITER ',' CSV HEADER;");
-
-    query1.on('end', () => {
-      done();
-    });
-
-    query2.on('end', () => {
-      done();
-    });
-
-    query3.on('end', () => {
-      done();
-    });
-
-    query4.on('end', () => {
-      done();
-      return res.json(results);
-    });
-  });
-});
-
 router.put('/api/v1/attendance/:quarter', urlencodedParser, (req, res, next) => {
   const results = [];
 
@@ -932,11 +927,6 @@ router.put('/api/v1/attendance/:quarter', urlencodedParser, (req, res, next) => 
     var nameAndAttendance = [];
 
     var query = client.query("SELECT username, meet_attend from members ORDER BY username ASC;");
-    var backup = client.query("COPY Members TO '/tmp/membersBackup.csv' DELIMITER ',' CSV HEADER;");
-
-    backup.on('end', () => {
-      done(); //For catching errors if copy statement is wrong
-    });
 
     query.on('row', (row) => {
       results.push(row);
@@ -1295,6 +1285,30 @@ router.post('/api/v1/getMoneyUsed', (req, res, next) => {
   });
 });
 
+/* Just calls the populate_floor_money() function */
+router.get('/api/v1/populateeFloorMoney', (req, res, next) => {
+  const results = [];
+
+  pg.connect(connectionString, (err, client, done) => {
+    if (err) {
+      done();
+      console.log(err);
+      return res.status(500).json({ success: false, data: err });
+    }
+
+    const query = client.query('SELECT * FROM populate_floor_money()');
+
+    query.on('row', (row) => {
+      results.push(row);
+    });
+
+    query.on('end', () => {
+      done();
+      return res.json(results);
+    });
+  });
+});
+
 
 /* Just calls the update_floor_money() function */
 router.get('/api/v1/updateFloorMoney', (req, res, next) => {
@@ -1347,7 +1361,7 @@ router.get('/api/v1/purgeMembers', (req, res, next) => {
 
 
 /* Calls the postgres function backup_members_table() */
-router.get('/api/v1/undoPurge', (req, res, next) => {
+router.get('/api/v1/resetAttendance', (req, res, next) => {
   const results = [];
 
   pg.connect(connectionString, (err, client, done) => {
@@ -1357,7 +1371,7 @@ router.get('/api/v1/undoPurge', (req, res, next) => {
       return res.status(500).json({ success: false, data: err });
     }
 
-    const query = client.query('SELECT * FROM undoPurge()');
+    const query = client.query('SELECT * FROM resetAttendance()');
 
     query.on('row', (row) => {
       results.push(row);
